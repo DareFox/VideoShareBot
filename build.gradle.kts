@@ -20,6 +20,10 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.11")
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
 
+    // ktor client
+    implementation("io.ktor:ktor-client-core:1.6.7")
+    implementation("io.ktor:ktor-client-cio:1.6.7")
+
     // Discord API
     implementation("com.kotlindiscord.kord.extensions:kord-extensions:$kordExtVersion")
 }
