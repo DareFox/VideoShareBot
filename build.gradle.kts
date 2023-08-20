@@ -16,6 +16,10 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
 
+    // Logger
+    implementation("ch.qos.logback:logback-classic:1.2.11")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
+
     // Discord API
     implementation("com.kotlindiscord.kord.extensions:kord-extensions:$kordExtVersion")
 }
