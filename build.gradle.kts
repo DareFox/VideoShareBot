@@ -18,7 +18,7 @@ dependencies {
 
     // Logger
     implementation("ch.qos.logback:logback-classic:1.2.11")
-    implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
     // ktor client
     implementation("io.ktor:ktor-client-core:2.2.4")
