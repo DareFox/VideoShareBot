@@ -17,7 +17,7 @@ dependencies {
     testImplementation(kotlin("test"))
 
     // Logger
-    implementation("ch.qos.logback:logback-classic:1.4.7")
+    implementation("org.slf4j:slf4j-simple:2.0.3")
     implementation("io.github.oshai:kotlin-logging:5.0.1")
 
     // ktor client
