@@ -1,7 +1,15 @@
-fun main(args: Array<String>) {
-    println("Hello World!")
+import com.kotlindiscord.kord.extensions.ExtensibleBot
+import dev.kord.gateway.Intent
+import dev.kord.gateway.Intents
 
-    // Try adding program arguments via Run/Debug configuration.
-    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
-    println("Program arguments: ${args.joinToString()}")
+suspend fun main(args: Array<String>) {
+    val bot = ExtensibleBot(EnvironmentConfig.discordToken) {
+        intents {
+            +Intents.nonPrivileged
+            +Intent.GuildMessages
+            +Intent.DirectMessages
+        }
+    }
+
+    bot.start()
 }
