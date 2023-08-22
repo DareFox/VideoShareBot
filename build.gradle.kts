@@ -17,7 +17,7 @@ dependencies {
     testImplementation(kotlin("test"))
 
     // Logger
-    implementation("ch.qos.logback:logback-classic:1.2.11")
+    implementation("ch.qos.logback:logback-classic:1.4.7")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
     // ktor client
