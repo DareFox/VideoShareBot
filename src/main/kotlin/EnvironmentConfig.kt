@@ -76,7 +76,10 @@ object EnvironmentConfig {
      * @return The boolean value of the environment variable, or the default value if not set or invalid.
      */
     private fun booleanEnv(string: String, default: Boolean): Boolean {
-        return string.toBooleanStrictOrNull() ?: default
+        return string
+            .trim()
+            .lowercase()
+            .toBooleanStrictOrNull() ?: default
     }
 }
 
