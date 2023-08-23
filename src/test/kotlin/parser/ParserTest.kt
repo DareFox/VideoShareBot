@@ -19,6 +19,7 @@ open class ParserTest(
         val messages = messageGenerator.generateValidOnly()
 
         messages.forEach {
+            println(it.string)
             assertContains(iterable = parser.parse(it.string), element = it.url)
         }
     }
@@ -28,6 +29,7 @@ open class ParserTest(
         val messages = messageGenerator.generateInvalidOnly()
 
         messages.forEach {
+            println(it.string)
             assertEquals(expected = listOf(), actual = parser.parse(it.string))
         }
     }
@@ -37,6 +39,7 @@ open class ParserTest(
         val messages = messageGenerator.generateValidAndInvalid()
 
         messages.forEach {
+            println(it.string)
             assertEquals(expected = listOf(it.validUrl), actual = parser.parse(it.string))
         }
     }
@@ -46,6 +49,7 @@ open class ParserTest(
         val messages = messageGenerator.generateEmpty()
 
         messages.forEach {
+            println(it)
             assertEquals(expected = listOf(), actual = parser.parse(it))
         }
     }
