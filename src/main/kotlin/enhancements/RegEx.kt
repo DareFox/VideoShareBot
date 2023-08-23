@@ -19,7 +19,7 @@ fun Sequence<MatchResult>.toValueList(): List<String> {
  * @param input The character sequence to search within.
  * @return A sequence of [MatchResult] objects representing matches from the regular expressions.
  */
-fun List<Regex>.find(input: CharSequence): Sequence<MatchResult> {
+fun List<Regex>.findAll(input: CharSequence): Sequence<MatchResult> {
     val sequences = this.map { it.findAll(input) }
 
     return sequenceOf(*sequences.toTypedArray()).flatten()
