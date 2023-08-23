@@ -12,7 +12,18 @@ fun Sequence<MatchResult>.toValueList(): List<String> {
     }
 }
 
+/**
+ * Extension function for finding occurrences of a collection of regular expressions in a character sequence.
+ *
+ * @receiver The list of [Regex] objects representing patterns to search for.
+ * @param input The character sequence to search within.
+ * @return A sequence of [MatchResult] objects representing matches from the regular expressions.
+ */
+fun List<Regex>.find(input: CharSequence): Sequence<MatchResult> {
+    val sequences = this.map { it.findAll(input) }
 
+    return sequenceOf(*sequences.toTypedArray()).flatten()
+}
 
 /**
  * Extension function for converting a list of string patterns into a list of regular expressions with specified options.
