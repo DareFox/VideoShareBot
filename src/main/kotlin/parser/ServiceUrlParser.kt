@@ -23,6 +23,15 @@ sealed class ServiceUrlParser(val name: String) {
 
 
     /**
+     * Combines the [URL start pattern][urlStartRegex], a custom regex, and the [URL end pattern][urlEndMultilineRegex] to create a complete regex pattern.
+     * @param options A set of regex options to be applied to the resulting regex pattern. Defaults to [RegexOption.MULTILINE].
+     * @return The combined regex pattern as a compiled regular expression.
+     */
+    protected fun String.wrapRegexPattern(
+        options: Set<RegexOption> = setOf(RegexOption.MULTILINE)
+    ) = "$urlStartRegex$this$urlEndMultilineRegex".toRegex(options)
+
+    /**
      * Parses the provided text and returns a list of URLs relevant to this specific online service.
      *
      * @param text The text to be parsed for service-specific URLs.
