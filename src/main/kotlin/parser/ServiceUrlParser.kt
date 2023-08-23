@@ -6,6 +6,21 @@ package parser
  * @property name A descriptive name for the specific online service.
  */
 sealed class ServiceUrlParser(val name: String) {
+    /**
+     * Regular expression pattern representing the start of a URL, including optional "https://" or "http://" and "www.".
+     *
+     * `(https://|http://|)(www\.|)`
+     */
+    protected val urlStartRegex = """(https://|http://|)(www\.|)"""
+
+    /**
+     * Regular expression pattern representing the end of a URL where it should not be followed by letters, numbers, or slash.
+     * Url params are permitted and will be matched
+     *
+     * `(?![a-zA-Z1-9\/])\S*`
+     */
+    protected val urlEndMultilineRegex = """(?![a-zA-Z1-9\/])\S*"""
+
 
     /**
      * Parses the provided text and returns a list of URLs relevant to this specific online service.
