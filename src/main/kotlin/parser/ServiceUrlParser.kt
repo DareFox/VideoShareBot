@@ -9,7 +9,7 @@ sealed class ServiceUrlParser(val name: String) {
     /**
      * Regular expression pattern representing the start of a URL, including optional "https://" or "http://" and "www.".
      *
-     * `(https://|http://|)(www\.|)`
+     * ### `(https://|http://|)(www\.|)`
      */
     protected val urlStartRegex = """(https://|http://|)(www\.|)"""
 
@@ -17,7 +17,7 @@ sealed class ServiceUrlParser(val name: String) {
      * Regular expression pattern representing the end of a URL where it should not be followed by letters, numbers, or slash.
      * Url params are permitted and will be matched
      *
-     * `(?![a-zA-Z1-9\/])\S*`
+     * ### `(?![a-zA-Z1-9\/])\S*`
      */
     protected val urlEndMultilineRegex = """(?![a-zA-Z1-9\/])\S*"""
 
