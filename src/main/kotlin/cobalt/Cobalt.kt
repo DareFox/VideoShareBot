@@ -1,15 +1,34 @@
 package cobalt
 
+import EnvironmentConfig
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import ktor
+import java.net.URL
+
 object Cobalt {
-    fun requestVideo(url: String) {
-        TODO()
+    suspend fun requestVideo(url: String): String? {
+        val response = requestCustom(CobaltRequest(url, isAudioOnly = false))
+        return response.url
     }
 
-    fun requestAudio(url: String) {
-        TODO()
+    suspend fun requestAudio(url: String): String? {
+        val response = requestCustom(CobaltRequest(url, isAudioOnly = true))
+        return response.audio
     }
 
-    fun requestCustom(request: CobaltRequest): CobaltResponse {
-        TODO()
+    suspend fun requestCustom(request: CobaltRequest): CobaltResponse {
+        val response: CobaltResponse = ktor.post {
+            url(URL(EnvironmentConfig.cobaltApiUrl, "api/json"))
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+
+        if (response.status == CobaltResponseStatus.ERROR) {
+            throw CobaltError(response.text ?: "[No error text]")
+        }
+
+        return response
     }
 }
