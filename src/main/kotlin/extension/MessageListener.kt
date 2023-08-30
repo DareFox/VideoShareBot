@@ -5,6 +5,7 @@ import com.kotlindiscord.kord.extensions.events.EventContext
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.utils.respond
 import dev.kord.core.event.message.MessageCreateEvent
+import enhancements.toSafeFilename
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.util.*
@@ -15,6 +16,7 @@ import parser.TikTokParser
 import parser.YoutubeShortsParser
 import java.io.File
 import java.io.InputStream
+import java.net.URL
 
 class MessageListener : LoggerExtension("MessageListener") {
     val parser = CompositeParser(
@@ -27,7 +29,6 @@ class MessageListener : LoggerExtension("MessageListener") {
         log.info { "setup" }
         event<MessageCreateEvent> {
             action {
-                log.info { "test" }
                 actionImpl()
             }
         }
@@ -43,7 +44,7 @@ class MessageListener : LoggerExtension("MessageListener") {
         val request = ktor.get(downloadUrl)
 
         event.message.respond {
-            addFile("video.mp4", ChannelProvider { request.content })
+            addFile(URL(shareUrl.first()).toSafeFilename() + ".mp4", ChannelProvider { request.content })
         }
     }
 }
