@@ -1,15 +1,19 @@
+import io.ktor.http.*
+import java.net.URI
+import java.net.URL
+
 /**
  * The `EnvironmentConfig` object is responsible for accessing environment variables used within the application.
  */
 object EnvironmentConfig {
     /**
-     * The base URL for the Cobalt API. This URL is used for making API requests to Cobalt services.
+     * The base URL for the cobalt.Cobalt API. This URL is used for making API requests to cobalt.Cobalt services.
      *
      * Environment variable name: `COBALT_API_URL`
      *
      * Default: `"https://co.wuk.sh/"`
      */
-    val cobaltApiUrl: String = stringEnv("COBALT_API_URL", "https://co.wuk.sh/")
+    val cobaltApiUrl: URL = URL(stringEnv("COBALT_API_URL", "https://co.wuk.sh/"))
     /**
      * A boolean flag indicating whether the application is in debug mode.
      *
