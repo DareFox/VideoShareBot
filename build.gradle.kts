@@ -24,6 +24,8 @@ dependencies {
     // ktor client
     implementation("io.ktor:ktor-client-core:2.2.4")
     implementation("io.ktor:ktor-client-cio:2.2.4")
+    implementation("io.ktor:ktor-client-content-negotiation:2.2.4")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
 
     // Discord API
     implementation("com.kotlindiscord.kord.extensions:kord-extensions:$kordExtVersion")
