@@ -1,7 +1,9 @@
 package cobalt
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class VideoQuality() {
     @SerialName("144")
     _144p,
