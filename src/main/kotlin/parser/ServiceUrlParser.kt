@@ -14,32 +14,28 @@ abstract class ServiceUrlParser(val name: String) {
     protected val urlStartRegex = """(https://|http://|)(www\.|)"""
 
     /**
-     * Regular expression pattern representing the end of a URL where it should not be followed by letters, numbers, or slash.
-     * Url params are permitted and will be matched
+     * Regular expression pattern representing URL parameters without a trailing slash.
      *
-     * ### `(?![a-zA-Z1-9\/])\S*`
+     * This regex pattern is used to match URL parameters that do not end with a slash.
      */
-    protected val urlEndNoSlashMultiline = """(?![a-zA-Z1-9\/])\S*"""
+    protected val paramsWithoutSlash = """(?![a-zA-Z1-9\/])\S*"""
 
     /**
-     * Regular expression pattern representing the end of a URL where it should not be followed by letters, numbers.
-     * Url params are permitted and will be matched
+     * Regular expression pattern representing URL parameters with a trailing slash.
      *
-     * ### `(?![a-zA-Z1-9\/])\S*`
+     * This regex pattern is used to match URL parameters that **CAN** end with a slash.
      */
-    protected val urlEndWithSlashMultiline = """(?![a-zA-Z1-9\/])\S*"""
-
-
+    protected val paramsWithPossibleSlash = """([^a-zA-Z1-9]\S*(\/|$|(?:\n)))"""
 
     /**
-     * Combines the [URL start pattern][urlStartRegex], a custom regex, and the [URL end pattern][urlEndNoSlashMultiline] to create a complete regex pattern.
+     * Combines the [URL start pattern][urlStartRegex], a custom regex, and the [URL params pattern][paramsWithoutSlash] to create a complete regex pattern.
      * @param options A set of regex options to be applied to the resulting regex pattern. Defaults to [RegexOption.MULTILINE].
      * @return The combined regex pattern as a compiled regular expression.
      */
     protected fun String.wrapRegexPattern(
         canEndOnSlash: Boolean = true,
         options: Set<RegexOption> = setOf(RegexOption.MULTILINE)
-    ) = "$urlStartRegex$this$urlEndNoSlashMultiline".toRegex(options)
+    ) = "$urlStartRegex$this$paramsWithoutSlash".toRegex(options)
 
     /**
      * Parses the provided text and returns a list of URLs relevant to this specific online service.
