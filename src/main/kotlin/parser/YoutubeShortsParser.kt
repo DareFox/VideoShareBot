@@ -1,11 +1,25 @@
 package parser
 
-import enhancements.toValueList
+import enhancements.CheckMachine
 
 object YoutubeShortsParser : ServiceUrlParser("YoutubeShorts") {
-    private val regex = """youtube\.com/shorts/\S{11}""".wrapRegexPattern()
+//    private val regex = """youtube\.com/shorts/\S{11}""".wrapRegexPattern()
     override fun parse(text: String): List<String> {
-        return regex.findAll(text).toValueList()
+        return anyUrlRegex.findAll(text).mapNotNull {
+            checkUrl(UrlSplitter(it.value))
+        }.toList()
+    }
+
+    private fun checkUrl(urlSplitter: UrlSplitter): String? {
+        val check = CheckMachine(
+            "isYoutube" to (urlSplitter.host.endsWith("youtube.com")),
+            "validPathLength" to (urlSplitter.pathSplit.size == 2),
+            "isShorts" to (urlSplitter.pathSplit.getOrNull(0) == "shorts"),
+            "validIdLength" to (urlSplitter.pathSplit.getOrNull(1)?.length == 11),
+            "noSlash" to (!urlSplitter.endsOnSlash)
+        )
+
+        return if (check.isAllTrue) urlSplitter.url else null
     }
 }
 
