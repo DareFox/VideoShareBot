@@ -31,9 +31,9 @@ class UrlSplitter(val url: String) {
             listOf()
         } else {
             val lastIndex = if (endsOnSlash) {
-                hostPathSplit.lastIndex - 1
-            } else {
                 hostPathSplit.lastIndex
+            } else {
+                hostPathSplit.lastIndex + 1
             }
             hostPathSplit.subList(1, lastIndex)
         }
