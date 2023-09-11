@@ -31,8 +31,8 @@ object RegexTester {
             Regex: ${regex.pattern}
             Input: $input
             Illegal: $illegalMatch
-            
         """.trimIndent() + "\n")
+
         val value = regex.find(input)?.value
         assertNotEquals(illegalMatch, value)
     }
@@ -45,7 +45,6 @@ object RegexTester {
             Regex: ${regex.pattern}
             Input: $input
             Expected: null
-            
         """.trimIndent() + "\n")
 
         assertNull(regex.find(input)?.value)
