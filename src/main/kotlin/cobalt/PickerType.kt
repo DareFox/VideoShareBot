@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 enum class PickerType {
     @SerialName("various")
     VARIOUS,
+
     @SerialName("images")
     IMAGES
 }

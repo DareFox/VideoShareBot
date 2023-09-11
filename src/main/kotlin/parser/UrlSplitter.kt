@@ -29,10 +29,12 @@ class UrlSplitter(val url: String) {
                 afterScheme = schemeSplit[0]
                 null
             }
+
             2 -> {
                 afterScheme = schemeSplit[1]
                 schemeSplit[0]
             }
+
             else -> throw IllegalArgumentException("Url is empty")
         }
 

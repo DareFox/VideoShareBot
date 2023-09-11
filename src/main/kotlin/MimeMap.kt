@@ -1,4 +1,4 @@
-val MimeMap = mapOf<String,String>(
+val MimeMap = mapOf<String, String>(
     "audio/aac" to ".aac",
     "audio/mpeg" to ".mp3",
     "audio/ogg" to ".oga",

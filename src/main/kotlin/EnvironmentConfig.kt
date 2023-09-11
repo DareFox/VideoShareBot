@@ -1,5 +1,3 @@
-import io.ktor.http.*
-import java.net.URI
 import java.net.URL
 
 /**
@@ -14,6 +12,7 @@ object EnvironmentConfig {
      * Default: `"https://co.wuk.sh/"`
      */
     val cobaltApiUrl: URL = URL(stringEnv("COBALT_API_URL", "https://co.wuk.sh/"))
+
     /**
      * A boolean flag indicating whether the application is in debug mode.
      *
@@ -22,12 +21,14 @@ object EnvironmentConfig {
      * Default value: `false`
      */
     val debugMode: Boolean = booleanEnv("ENABLE_DEBUG", false)
+
     /**
      * The Discord bot token used for authentication and communication with the Discord API.
      *
      * Environment variable name: `DISCORD_BOT_TOKEN`.
      */
     val discordToken: String = stringEnv("DISCORD_BOT_TOKEN")
+
     /**
      * The ID of the Discord test server, if applicable.
      *

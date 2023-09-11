@@ -1,7 +1,6 @@
 package parser
 
 import enhancements.CheckMachine
-import enhancements.isOnlyTrue
 
 object TikTokParser : ServiceUrlParser("TikTok") {
     override fun parse(text: String): List<String> {
@@ -31,11 +30,13 @@ object TikTokParser : ServiceUrlParser("TikTok") {
             "noSlash" to !splitter.endsOnSlash
         )
 
-        log.debug { """
+        log.debug {
+            """
             url = ${splitter.url},
             checks = $check,
             splitter = $splitter
-        """.trimIndent() }
+        """.trimIndent()
+        }
         return if (check.isAllTrue) splitter.url else null
     }
 
@@ -47,11 +48,13 @@ object TikTokParser : ServiceUrlParser("TikTok") {
             "noSlash" to !splitter.endsOnSlash
         )
 
-        log.debug { """
+        log.debug {
+            """
             url = ${splitter.url},
             checks = $check,
             splitter = $splitter
-        """.trimIndent() }
+        """.trimIndent()
+        }
         return if (check.isAllTrue) splitter.url else null
     }
 }

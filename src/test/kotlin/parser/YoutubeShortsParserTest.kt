@@ -1,8 +1,5 @@
 package parser
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-
 class YoutubeShortsParserTest: ParserTest(
     parser = YoutubeShortsParser,
     validUrls = listOf(
