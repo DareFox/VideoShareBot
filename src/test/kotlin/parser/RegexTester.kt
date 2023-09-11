@@ -5,7 +5,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-object RegexTest {
+object RegexTester {
     fun shouldMatch(
         regex: Regex,
         input: String,
