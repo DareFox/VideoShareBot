@@ -1,11 +1,14 @@
 package parser
 
+import io.github.oshai.kotlinlogging.KotlinLogging
+
 /**
  * An abstract base class for parsing URLs related to various online services such as YouTube, TikTok, etc.
  *
  * @property name A descriptive name for the specific online service.
  */
 abstract class ServiceUrlParser(val name: String) {
+    protected val log = KotlinLogging.logger(name)
 
     /**
      * Regular expression used to match any URLs
