@@ -39,3 +39,7 @@ local.properties
 # Allow workspace files
 !.idea/runConfigurations/
 
+# Sandbox
+src/main/kotlin/Example.kt
+src/main/kotlin/Sandbox.kt
+src/main/kotlin/Test.kt
