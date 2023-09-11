@@ -13,14 +13,9 @@ class CheckMachine(val states: Map<String, Boolean>) {
     val isAllTrue by lazy { states.all { it.value } }
 
     override fun toString(): String {
-        val falseString = falsePairs.map { it.first }.let {
-            "[${it.joinToString(", ")}]"
-        }
+        val falseString = falsePairs.joinToString(", ", "[", "]") { it.first }
+        val trueString = truePairs.joinToString(", ", "[", "]") { it.first }
 
-        val trueString = truePairs.map { it.first }.let {
-            "[${it.joinToString(", ")}]"
-        }
-
-        return "CheckMachine(true=$trueString;false=$falseString)"
+        return "CheckMachine(true=$trueString; false=$falseString)"
     }
 }
