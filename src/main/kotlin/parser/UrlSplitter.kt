@@ -1,5 +1,16 @@
 package parser
 
+/**
+ * A utility class for splitting and analyzing URLs into their constituent parts such as scheme, host, and path.
+ *
+ * @param url The URL string to be split and analyzed.
+ * @property scheme The scheme (e.g., "http", "https") part of the URL, or null if not present.
+ * @property host The host part of the URL, typically representing the domain.
+ * @property pathSplit A list of path segments extracted from the URL, excluding the scheme and host.
+ * @property endsOnSlash Indicates whether the URL ends with a forward slash ('/').
+ *
+ * @throws IllegalArgumentException if the URL is empty or improperly formatted.
+ */
 class UrlSplitter(val url: String) {
     val scheme: String?
     val host: String
