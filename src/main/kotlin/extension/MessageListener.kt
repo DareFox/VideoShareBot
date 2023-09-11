@@ -24,6 +24,7 @@ class MessageListener : LoggerExtension("MessageListener") {
             YoutubeShortsParser
         )
     )
+
     override suspend fun setup() {
         event<MessageCreateEvent> {
             action {
@@ -42,7 +43,8 @@ class MessageListener : LoggerExtension("MessageListener") {
         val request = ktor.get(downloadUrl)
 
         val contentType = request.headers.get("Content-Type") ?: throw IllegalReceiveException("No content-type")
-        val extension = MimeMap[contentType] ?: throw IllegalReceiveException("Content-type $contentType is not supported")
+        val extension =
+            MimeMap[contentType] ?: throw IllegalReceiveException("Content-type $contentType is not supported")
         val filename = URL(shareUrl.first()).toSafeFilename() + extension
 
         event.message.respond {

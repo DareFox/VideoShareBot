@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 enum class PickerItemType {
     @SerialName("video")
     VIDEO,
+
     @SerialName("photo")
     PHOTO
 }
