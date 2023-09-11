@@ -1,5 +1,6 @@
-package enhancements
+package tools
 
+import tools.CheckMachine
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
