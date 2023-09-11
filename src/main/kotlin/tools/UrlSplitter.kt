@@ -1,4 +1,4 @@
-package parser
+package tools
 
 /**
  * A utility class for splitting and analyzing URLs into their constituent parts such as scheme, host, and path.

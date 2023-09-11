@@ -1,4 +1,4 @@
-package enhancements
+package tools
 
 class CheckMachine(val states: Map<String, Boolean>) {
     constructor(states: List<Pair<String, Boolean>>) : this(states.toMap())
