@@ -20,7 +20,7 @@ object Anything: UrlSegmentMatcher {
     override fun validate(text: String): Boolean = true
 }
 
-class TextStartsWith(val prefix: String, val ignoreCase: Boolean): UrlSegmentMatcher {
+class TextStartsWith(val prefix: String, val ignoreCase: Boolean = false): UrlSegmentMatcher {
     override fun validate(text: String): Boolean = text.startsWith(prefix, ignoreCase)
 }
 
