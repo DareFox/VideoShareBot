@@ -1,6 +1,10 @@
-package match
+package match.services
 
 import enhancements.nestedListOf
+import match.SpecificText
+import match.Text
+import match.UrlMatcher
+import match.UrlPattern
 
 object YoutubeShortsMatcher : UrlMatcher() {
     override val pattern = UrlPattern(

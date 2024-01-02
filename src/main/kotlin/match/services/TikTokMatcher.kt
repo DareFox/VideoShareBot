@@ -1,4 +1,7 @@
-package match
+package match.services
+
+import match.*
+import match.Number
 
 object TikTokMatcher: UrlMatcher() {
     override val pattern: UrlPattern = UrlPattern(
