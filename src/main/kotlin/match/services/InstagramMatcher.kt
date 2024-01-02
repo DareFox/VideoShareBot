@@ -2,7 +2,7 @@ package match.services
 
 import enhancements.nestedListOf
 import match.SpecificText
-import match.Text
+import match.TextLength
 import match.UrlMatcher
 import match.UrlPattern
 
@@ -12,7 +12,7 @@ object InstagramMatcher: UrlMatcher() {
         listOf("www", ""),
         segmentMatchers = nestedListOf(
             SpecificText("reel"),
-            Text(11)
+            TextLength(11)
         )
     )
 }

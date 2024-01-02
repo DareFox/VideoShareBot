@@ -7,7 +7,7 @@ object RedditMatcher: UrlMatcher() {
         Anything,
         Anything,
         SpecificText("comments"),
-        Text(7)
+        TextLength(7)
     )
 
     override val pattern = UrlPattern(

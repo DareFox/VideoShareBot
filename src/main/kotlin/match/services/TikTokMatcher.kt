@@ -14,7 +14,7 @@ object TikTokMatcher: UrlMatcher() {
                 Number(length = 19)
             ),
             listOf(
-                Text(length = 9)
+                TextLength(length = 9)
             )
         )
     )

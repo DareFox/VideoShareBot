@@ -2,7 +2,7 @@ package match.services
 
 import enhancements.nestedListOf
 import match.SpecificText
-import match.Text
+import match.TextLength
 import match.UrlMatcher
 import match.UrlPattern
 
@@ -12,7 +12,7 @@ object YoutubeShortsMatcher : UrlMatcher() {
         subdomains = listOf("", "www"),
         segmentMatchers = nestedListOf(
             SpecificText(shouldBe = "shorts"),
-            Text(length = 11)
+            TextLength(length = 11)
         )
     )
 }
