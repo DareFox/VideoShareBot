@@ -8,7 +8,7 @@ class SpecificText(val shouldBe: String, val ignoreCase: Boolean = false): UrlSe
     override fun validate(text: String): Boolean = text.equals(shouldBe, false)
 }
 
-class Text(val length: Int): UrlSegmentMatcher {
+class TextLength(val length: Int): UrlSegmentMatcher {
     override fun validate(text: String): Boolean = text.length == length
 }
 
