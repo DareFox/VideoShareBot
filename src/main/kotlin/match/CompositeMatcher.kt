@@ -1,17 +1,17 @@
-package parser
+package match
 
 /**
- * A composite parser that aggregates and utilizes a set of service-specific parsers to parse URLs from a given text.
+ * A composite matcher that aggregates and utilizes a set of service-specific matchers to parse URLs from a given text.
  *
- * @property parsers A set of service-specific parsers to be used for parsing.
+ * @property parsers A set of service-specific matcher to be used for parsing.
  */
-class CompositeParser(private val parsers: Set<ServiceUrlParser>) {
+class CompositeMatcher(private val parsers: Set<UrlMatcher>) {
 
     /**
      * Parses the provided text using each service-specific parser and returns a list of URLs.
      *
      * @param string The text to be parsed for URLs.
-     * @return A list of URLs parsed from the text using the aggregated parsers.
+     * @return A list of URLs parsed from the text using the aggregated matchers.
      */
     fun parse(string: String): List<String> {
         val urlList = mutableListOf<String>()
