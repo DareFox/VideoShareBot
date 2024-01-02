@@ -1,4 +1,6 @@
-package match
+package match.services
+
+import match.*
 
 object RedditMatcher: UrlMatcher() {
     private val withoutId = listOf(

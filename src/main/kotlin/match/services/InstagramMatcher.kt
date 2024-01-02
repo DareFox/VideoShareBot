@@ -1,7 +1,10 @@
-package match
+package match.services
 
 import enhancements.nestedListOf
-import io.ktor.http.*
+import match.SpecificText
+import match.Text
+import match.UrlMatcher
+import match.UrlPattern
 
 object InstagramMatcher: UrlMatcher() {
     override val pattern = UrlPattern(
