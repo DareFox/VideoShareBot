@@ -1,5 +1,7 @@
 package parser
 
+import match.YoutubeShortsParser
+
 class YoutubeShortsParserTest: ParserTest(
     parser = YoutubeShortsParser,
     validUrls = listOf(
