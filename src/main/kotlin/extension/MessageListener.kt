@@ -29,6 +29,7 @@ class MessageListener : LoggerExtension("MessageListener") {
             TikTokMatcher,
             YoutubeShortsMatcher,
             TwitterMatcher,
+            RedditMatcher
         )
     )
 
