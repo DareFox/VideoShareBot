@@ -1,6 +1,14 @@
 package enhancements
 
+import java.net.MalformedURLException
 import java.net.URL
+fun String.tryParseURL(): URL? {
+    return try {
+        URL(this)
+    } catch (_: MalformedURLException) {
+        null
+    }
+}
 
 /**
  * Extension function to clean and convert a URL into a safe filename format.
