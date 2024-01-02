@@ -2,7 +2,7 @@ package match.services
 
 import enhancements.nestedListOf
 import match.*
-import match.Number
+import match.NumberLength
 
 object TwitterMatcher: UrlMatcher() {
     override val pattern = UrlPattern(
@@ -10,7 +10,7 @@ object TwitterMatcher: UrlMatcher() {
         segmentMatchers = nestedListOf(
             Anything,
             SpecificText("status"),
-            Number(19)
+            NumberLength(19)
         )
     )
 }

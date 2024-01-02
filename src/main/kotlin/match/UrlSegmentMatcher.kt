@@ -24,10 +24,10 @@ class TextStartsWith(val prefix: String, val ignoreCase: Boolean): UrlSegmentMat
     override fun validate(text: String): Boolean = text.startsWith(prefix, ignoreCase)
 }
 
-class Number(val length: Int): UrlSegmentMatcher {
+class NumberLength(val numberOfDigits: Int): UrlSegmentMatcher {
     override fun validate(text: String): Boolean {
         text.toLongOrNull() ?: return false
-        return text.length == length
+        return text.length == numberOfDigits
     }
 }
 
