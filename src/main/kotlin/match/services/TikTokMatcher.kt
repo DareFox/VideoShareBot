@@ -1,7 +1,7 @@
 package match.services
 
 import match.*
-import match.Number
+import match.NumberLength
 
 object TikTokMatcher: UrlMatcher() {
     override val pattern: UrlPattern = UrlPattern(
@@ -11,7 +11,7 @@ object TikTokMatcher: UrlMatcher() {
             listOf(
                 Anything,
                 SpecificText("video"),
-                Number(length = 19)
+                NumberLength(numberOfDigits = 19)
             ),
             listOf(
                 TextLength(length = 9)
