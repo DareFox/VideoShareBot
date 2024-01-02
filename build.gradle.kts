@@ -21,6 +21,9 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.3")
     implementation("io.github.oshai:kotlin-logging:5.0.1")
 
+    implementation("me.darefox:cobaltik:1.0.0")
+
+
     // ktor client
     implementation("io.ktor:ktor-client-core:2.2.4")
     implementation("io.ktor:ktor-client-cio:2.2.4")
