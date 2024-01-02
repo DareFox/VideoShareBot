@@ -14,17 +14,18 @@ package tools
  */
 class CheckMachine(val states: Map<String, Boolean>) {
     /**
+     * Constructor that initializes the CheckMachine with a vararg list of state pairs.
+     *
+     * @param states A vararg list of state pairs where each pair contains a state name and a boolean indicator.
+     */
+    constructor(vararg states: Pair<String, () -> Boolean>) : this(states.associate { it.first to it.second() })
+
+    /**
      * Constructor that initializes the CheckMachine with a map of states.
      *
      * @param states A map where keys are state names and values are boolean indicators.
      */
     constructor(states: List<Pair<String, Boolean>>) : this(states.toMap())
-    /**
-     * Constructor that initializes the CheckMachine with a vararg list of state pairs.
-     *
-     * @param states A vararg list of state pairs where each pair contains a state name and a boolean indicator.
-     */
-    constructor(vararg states: Pair<String, Boolean>) : this(states.toMap())
 
     /**
      * Lazily computed property that returns a list of pairs where the state is false.
