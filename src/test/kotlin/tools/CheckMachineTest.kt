@@ -23,7 +23,7 @@ class CheckMachineTest {
     @Test
     fun `Test constructor with varargs`() {
         val expectedStates = mapOf("A" to true, "B" to false, "C" to true)
-        assertEquals(expectedStates, CheckMachine("A" to true, "B" to false, "C" to true).states)
+        assertEquals(expectedStates, CheckMachine("A" to {true}, "B" to {false}, "C" to {true}).states)
     }
 
     @Test
