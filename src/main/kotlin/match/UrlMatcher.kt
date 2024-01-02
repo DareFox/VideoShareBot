@@ -37,7 +37,7 @@ abstract class UrlMatcher {
     }
 
     private fun applySegmentMatchers(matchers: List<List<UrlSegmentMatcher>>, url: URL): URL? {
-        val path = url.path.removeSurrounding("/").split("/")
+        val path = url.path.removeSuffix("/").removePrefix("/").split("/")
         val usefulMatchers = matchers.filter {
             it.size == path.size
         }
