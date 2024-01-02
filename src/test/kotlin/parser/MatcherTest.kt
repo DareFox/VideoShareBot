@@ -1,18 +1,18 @@
 package parser
 
+import match.UrlMatcher
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
-open class ParserTest(
-    val parser: ServiceUrlParser,
+abstract class MatcherTest(
+    val parser: UrlMatcher,
     validUrls: List<String>,
     invalidUrls: List<String>,
 ) {
     private val messageGenerator = MessageGenerator(
         validUrls = validUrls, invalidUrls = invalidUrls
     )
-
 
     @Test
     fun `Parsing valid URLs should return expected results`() {

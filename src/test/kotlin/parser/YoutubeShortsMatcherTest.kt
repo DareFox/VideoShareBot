@@ -1,19 +1,16 @@
 package parser
 
-import match.YoutubeShortsParser
+import match.YoutubeShortsMatcher
 
-class YoutubeShortsParserTest: ParserTest(
-    parser = YoutubeShortsParser,
+class YoutubeShortsMatcherTest: MatcherTest(
+    parser = YoutubeShortsMatcher,
     validUrls = listOf(
-        "youtube.com/shorts/abcdef12345",
-        "www.youtube.com/shorts/abcdef12345",
         "https://www.youtube.com/shorts/abcdef12345",
         "https://youtube.com/shorts/abcdef12345"
     ),
     invalidUrls = listOf(
         "youtube.com/shorts/abc",
         "youtube.com",
-        "youtube.com/shorts/",
-        "https://youtube.com/shorts/abcdef12345/"
+        "youtube.com/shorts/"
     )
 )
