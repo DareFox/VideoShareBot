@@ -10,6 +10,7 @@ import dev.kord.core.event.message.MessageCreateEvent
 import extensions.toSafeFilename
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
 import io.ktor.util.*
 import ktor
 import match.*
@@ -41,9 +42,7 @@ class MessageListener : LoggerExtension("MessageListener") {
         }
     }
 
-    @OptIn(InternalAPI::class)
     private suspend fun EventContext<MessageCreateEvent>.stream(streamResponse: StreamResponse, parseResult: CompositeMatcherResult) {
-        val url = parseResult.url
         val pair = downloadMedia(streamResponse.streamUrl)
         event.message.respond {
             addFile(pair.first, pair.second)
@@ -53,15 +52,15 @@ class MessageListener : LoggerExtension("MessageListener") {
         }
     }
 
-    @OptIn(InternalAPI::class)
     private suspend fun downloadMedia(url: String): Pair<String,ChannelProvider> {
         val request = ktor.get(url)
         val contentType = request.headers["Content-Type"] ?: "video/mp4"
         val extension =
             MimeMap[contentType] ?: throw IllegalReceiveException("Content-type $contentType is not supported")
         val filename = URL(url).toSafeFilename() + extension
+        val channel = request.bodyAsChannel()
 
-        return filename to ChannelProvider { request.content }
+        return filename to ChannelProvider { channel }
     }
 
     private suspend fun EventContext<MessageCreateEvent>.redirect(redirectResponse: RedirectResponse) {
