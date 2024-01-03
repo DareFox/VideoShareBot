@@ -1,6 +1,6 @@
 package parser
 
-import match.TikTokMatcher
+import match.services.TikTokMatcher
 
 class TikTokMatcherTest : MatcherTest(
     parser = TikTokMatcher,
