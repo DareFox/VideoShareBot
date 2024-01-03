@@ -1,6 +1,6 @@
 package match.services
 
-import enhancements.nestedListOf
+import extensions.nestedListOf
 import match.SpecificText
 import match.TextLength
 import match.UrlMatcher

@@ -1,4 +1,4 @@
-package enhancements
+package extensions
 
 import java.net.MalformedURLException
 import java.net.URL
