@@ -28,7 +28,8 @@ class MessageListener : LoggerExtension("MessageListener") {
             YoutubeShortsMatcher,
             TwitterMatcher,
             RedditMatcher,
-            VkMatcher
+            VkMatcher,
+            InstagramMatcher
         )
     )
 
@@ -79,8 +80,16 @@ class MessageListener : LoggerExtension("MessageListener") {
 
         log.info { "Trying to ask cobalt for $parseResult" }
         val client = Cobalt("https://co.wuk.sh/")
+
         when (val response = client.request(parseResult.url)) {
-            is RedirectResponse -> redirect(response)
+            is RedirectResponse -> {
+                if (parseResult.parser is InstagramMatcher) {
+                    // Instagram doesn't play in discord when redirecting link
+                    stream(StreamResponse(response.redirectUrl), parseResult)
+                } else {
+                    redirect(response)
+                }
+            }
             is StreamResponse -> stream(response, parseResult)
             else -> return
         }
