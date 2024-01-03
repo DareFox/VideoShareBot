@@ -9,7 +9,7 @@ group = "me.darefox"
 version = "1.0-SNAPSHOT"
 
 // Discord API version
-val kordExtVersion = "1.5.6"
+val kordExtVersion = "1.6.0"
 
 repositories {
     mavenCentral()
