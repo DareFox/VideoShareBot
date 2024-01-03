@@ -1,4 +1,4 @@
-package enhancements
+package extensions
 
 import com.kotlindiscord.kord.extensions.utils.respond
 import dev.kord.core.entity.Message

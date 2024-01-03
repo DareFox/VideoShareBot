@@ -1,4 +1,4 @@
-package enhancements
+package extensions
 
 /**
  *  Shortcut for `listOf(listOf(...))`

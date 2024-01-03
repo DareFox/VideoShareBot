@@ -1,4 +1,4 @@
-package enhancements
+package extensions
 
 import dev.kord.common.entity.PremiumTier
 import dev.kord.core.entity.Guild

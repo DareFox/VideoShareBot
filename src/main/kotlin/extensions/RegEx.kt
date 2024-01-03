@@ -1,4 +1,4 @@
-package enhancements
+package extensions
 
 /**
  * Extension function for converting a sequence of [MatchResult] objects into a list of matched values.
