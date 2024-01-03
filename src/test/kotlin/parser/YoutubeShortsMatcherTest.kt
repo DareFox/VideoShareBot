@@ -1,6 +1,6 @@
 package parser
 
-import match.YoutubeShortsMatcher
+import match.services.YoutubeShortsMatcher
 
 class YoutubeShortsMatcherTest: MatcherTest(
     parser = YoutubeShortsMatcher,
