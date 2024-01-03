@@ -4,20 +4,18 @@ import MimeMap
 import com.kotlindiscord.kord.extensions.events.EventContext
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.utils.respond
-import com.kotlindiscord.kord.extensions.utils.suppressEmbeds
 import com.sun.nio.sctp.IllegalReceiveException
 import dev.kord.core.behavior.edit
 import dev.kord.core.event.message.MessageCreateEvent
-import dev.kord.rest.builder.message.create.embed
 import enhancements.sendErrorAsEmbed
 import enhancements.toSafeFilename
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.util.*
 import io.ktor.utils.io.errors.*
-import io.ktor.utils.io.jvm.javaio.*
 import ktor
 import match.*
+import match.services.*
 import me.darefox.cobaltik.wrapper.Cobalt
 import me.darefox.cobaltik.wrapper.RedirectResponse
 import me.darefox.cobaltik.wrapper.StreamResponse
@@ -29,7 +27,8 @@ class MessageListener : LoggerExtension("MessageListener") {
             TikTokMatcher,
             YoutubeShortsMatcher,
             TwitterMatcher,
-            RedditMatcher
+            RedditMatcher,
+            VkMatcher
         )
     )
 
@@ -42,7 +41,8 @@ class MessageListener : LoggerExtension("MessageListener") {
     }
 
     @OptIn(InternalAPI::class)
-    private suspend fun EventContext<MessageCreateEvent>.stream(streamResponse: StreamResponse, url: String) {
+    private suspend fun EventContext<MessageCreateEvent>.stream(streamResponse: StreamResponse, parseResult: CompositeMatcherResult) {
+        val url = parseResult.url
         val request = try {
             ktor.get(streamResponse.streamUrl)
         } catch (err: IOException) {
@@ -56,7 +56,6 @@ class MessageListener : LoggerExtension("MessageListener") {
         val filename = URL(url).toSafeFilename() + extension
 
         event.message.respond {
-//            addFile("", ChannelProvider { "".byteInputStream().toByteReadChannel() })
             addFile(filename, ChannelProvider { request.content })
         }
         event.message.edit {
@@ -71,20 +70,19 @@ class MessageListener : LoggerExtension("MessageListener") {
         }
     }
 
-    @OptIn(InternalAPI::class)
     private suspend fun EventContext<MessageCreateEvent>.actionImpl() {
         if (event.member?.isBot == true) return
         val shareUrl = parser.parse(event.message.content)
 
         if (shareUrl.isEmpty()) return
+        val parseResult = shareUrl.first()
+
+        log.info { "Trying to ask cobalt for $parseResult" }
         val client = Cobalt("https://co.wuk.sh/")
-        val url = when (val response = client.request(shareUrl.first())) {
+        when (val response = client.request(parseResult.url)) {
             is RedirectResponse -> redirect(response)
-            is StreamResponse -> stream(response, shareUrl.first())
+            is StreamResponse -> stream(response, parseResult)
             else -> return
         }
-
-
-
     }
 }
