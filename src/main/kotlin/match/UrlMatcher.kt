@@ -3,6 +3,9 @@ package match
 import enhancements.tryParseURL
 import java.net.URL
 
+/**
+ * Class for matching URLs based on specific patterns.
+ */
 abstract class UrlMatcher {
     private val supportedProtocols = listOf("https", "http")
 
@@ -13,8 +16,17 @@ abstract class UrlMatcher {
         // i hate regex
         "[-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?".toRegex()
 
+    /**
+     * The URL pattern used for matching.
+     */
     protected abstract val pattern: UrlPattern
 
+    /**
+     * Extracts URLs from text that match a specific pattern.
+     *
+     * @param text The text to search for URLs.
+     * @return A list of matching URLs.
+     */
     fun parse(text: String): List<String> {
         return anyUrlRegex.findAll(text).mapNotNull {
             it.value.tryParseURL()
