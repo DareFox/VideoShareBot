@@ -54,7 +54,7 @@ class MessageListener : LoggerExtension("MessageListener") {
         val parseResult = shareUrl.first()
 
         val botMessage = event.message.respond(
-            "Trying to downloaded it...".toSingleCodeLineMarkdown(),
+            "Trying to find video..".toSingleCodeLineMarkdown(),
             pingInReply = false,
             useReply = true
         )
