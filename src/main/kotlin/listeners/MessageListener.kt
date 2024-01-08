@@ -80,11 +80,8 @@ class MessageListener : LoggerExtension("MessageListener") {
                 log.error { "${parseResult.url} ERR:" + response.text }
             }
 
-            response is RateLimitResponse ->{
-                botMessage.edit {
-                    content = "$stopSignEmoji Too much requests. Try again later"
-                }
-            }
+            response is RateLimitResponse
+                -> botMessage.editText("$stopSignEmoji Too much requests. Try again later".toSingleCodeLineMarkdown())
             else -> return
         }
     }
@@ -105,6 +102,8 @@ class MessageListener : LoggerExtension("MessageListener") {
         parseResult: CompositeMatcherResult,
         botMessage: Message
     ) {
+        botMessage.editText("Downloading media...".toSingleCodeLineMarkdown())
+
         val pair = try {
             downloadMedia(streamResponse.streamUrl)
         } catch (e: IOException) {
@@ -126,9 +125,7 @@ class MessageListener : LoggerExtension("MessageListener") {
         redirectResponse: RedirectResponse,
         botMessage: Message
     ) {
-        botMessage.edit {
-            content = redirectResponse.redirectUrl
-        }
+        botMessage.editText(redirectResponse.redirectUrl)
         event.message.edit {
             suppressEmbeds = true
         }
@@ -141,9 +138,7 @@ class MessageListener : LoggerExtension("MessageListener") {
     ) {
         when (response.type) {
             PickerType.VARIOUS -> {
-                botMessage.edit {
-                    content = "$stopSignEmoji This type is not supported by bot"
-                }
+                botMessage.editText("$stopSignEmoji This type is not supported by bot".toSingleCodeLineMarkdown())
             }
             PickerType.IMAGES -> {
                 pickerImages(response, botMessage)
@@ -157,7 +152,7 @@ class MessageListener : LoggerExtension("MessageListener") {
     ) {
         val chunks = response.items.chunked(10)
         val errorCounter = AtomicInt(0)
-        
+
         for ((index, chunk) in chunks.withIndex()) {
             if (index == 0) {
                 botMessage.edit {
@@ -176,9 +171,7 @@ class MessageListener : LoggerExtension("MessageListener") {
         }
 
         if (errorCounter.get() == response.items.size) {
-            botMessage.edit {
-                "$stopSignEmoji Couldn't download any media"
-            }
+            botMessage.editText("$stopSignEmoji Couldn't download any media".toSingleCodeLineMarkdown())
         }
     }
 
@@ -194,11 +187,15 @@ class MessageListener : LoggerExtension("MessageListener") {
                 addFile(pair.first, pair.second)
             } catch (e: Throwable) {
                 log.error(e) { "error during downloading media" }
-                if (errorCounter.get() == 0) botMessage.edit {
-                    content = "$stopSignEmoji I couldn't download all media"
-                }
+                if (errorCounter.get() == 0) botMessage.editText( "$stopSignEmoji I couldn't download all media".toSingleCodeLineMarkdown())
                 errorCounter.incrementAndGet()
             }
+        }
+    }
+
+    private suspend fun Message.editText(string: String?) {
+        edit {
+            content = string
         }
     }
 }
