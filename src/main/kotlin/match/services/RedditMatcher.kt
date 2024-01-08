@@ -6,8 +6,8 @@ object RedditMatcher: UrlMatcher() {
     private val withoutId = listOf(
         Anything,
         Anything,
-        SpecificText("comments"),
-        TextLength(7)
+        SpecificText("comments") or SpecificText("s"),
+        TextLength(7) or TextLength(10)
     )
 
     override val pattern = UrlPattern(
