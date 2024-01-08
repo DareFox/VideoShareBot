@@ -9,7 +9,7 @@ package match
  *
  * Path element in link is `skyfall` ; `when` ; `you` ; `crumble`
  */
-interface UrlSegmentMatcher {
+fun interface UrlSegmentMatcher {
 
     /**
      * Examines the provided text and determines whether it aligns with the specified validation criteria.
