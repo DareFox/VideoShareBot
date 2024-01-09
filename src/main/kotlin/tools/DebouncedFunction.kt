@@ -4,7 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlin.time.Duration
 
-class DebouncedFunction<T>(private val delayDuration: Duration, private val function: (T) -> Unit) {
+class DebouncedFunction<T>(private val delayDuration: Duration, private val function: suspend (T) -> Unit) {
     private val scope = CoroutineScope(context = Dispatchers.Default)
     private val mutex = Mutex()
 
@@ -34,7 +34,7 @@ class DebouncedFunction<T>(private val delayDuration: Duration, private val func
 
     }
 
-    private fun callFunction(arg: T) {
+    private suspend fun callFunction(arg: T) {
         function(arg)
     }
 
