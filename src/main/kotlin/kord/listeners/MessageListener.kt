@@ -1,28 +1,24 @@
 package kord.listeners
 
-import MimeMap
 import co.touchlab.stately.concurrency.AtomicInt
 import com.kotlindiscord.kord.extensions.events.EventContext
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.utils.respond
-import com.sun.nio.sctp.IllegalReceiveException
 import dev.kord.core.behavior.edit
 import dev.kord.core.entity.Message
 import dev.kord.core.event.message.MessageCreateEvent
 import extensions.sendErrorAsEmbed
-import extensions.toSafeFilename
 import extensions.toSingleCodeLineMarkdown
+import http.streamInternetFile
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.utils.io.errors.*
-import ktor
 import match.*
 import match.services.*
 import me.darefox.cobaltik.models.PickerItem
 import me.darefox.cobaltik.models.PickerType
 import me.darefox.cobaltik.wrapper.*
-import java.net.URL
 
 class MessageListener : LoggerExtension("MessageListener") {
     private val stopSignEmoji = "\uD83D\uDED1"
@@ -86,17 +82,6 @@ class MessageListener : LoggerExtension("MessageListener") {
         }
     }
 
-    private suspend fun downloadMedia(url: String): Pair<String,ChannelProvider> {
-        val request = ktor.get(url)
-        val contentType = request.headers["Content-Type"] ?: "video/mp4"
-        val extension =
-            MimeMap[contentType] ?: throw IllegalReceiveException("Content-type $contentType is not supported")
-        val filename = URL(url).toSafeFilename() + extension
-        val channel = request.bodyAsChannel()
-
-        return filename to ChannelProvider { channel }
-    }
-
     private suspend fun EventContext<MessageCreateEvent>.stream(
         streamResponse: StreamResponse,
         parseResult: CompositeMatcherResult,
@@ -104,8 +89,8 @@ class MessageListener : LoggerExtension("MessageListener") {
     ) {
         botMessage.editText("Downloading media...".toSingleCodeLineMarkdown())
 
-        val pair = try {
-            downloadMedia(streamResponse.streamUrl)
+        val response = try {
+            streamInternetFile(streamResponse.streamUrl)
         } catch (e: IOException) {
             botMessage.delete("Error")
             event.message.sendErrorAsEmbed(e)
@@ -114,7 +99,7 @@ class MessageListener : LoggerExtension("MessageListener") {
 
         botMessage.edit {
             content = null
-            addFile(pair.first, pair.second)
+            addFile(response.filename, ChannelProvider { response.stream })
         }
         event.message.edit {
             suppressEmbeds = true
@@ -183,8 +168,8 @@ class MessageListener : LoggerExtension("MessageListener") {
     ) {
         for (image in chunk) {
             try {
-                val pair = downloadMedia(image.url)
-                addFile(pair.first, pair.second)
+                val response = streamInternetFile(image.url)
+                addFile(response.filename, ChannelProvider { response.stream })
             } catch (e: Throwable) {
                 log.error(e) { "error during downloading media" }
                 if (errorCounter.get() == 0) botMessage.editText( "$stopSignEmoji I couldn't download all media".toSingleCodeLineMarkdown())
