@@ -30,9 +30,14 @@ dependencies {
     // Discord API
     implementation("com.kotlindiscord.kord.extensions:kord-extensions:$kordExtVersion")
 
+    // Result monad
+    implementation(platform("dev.forkhandles:forkhandles-bom:2.12.2.0"))
+    implementation("dev.forkhandles:result4k")
+
     // Other
     implementation("me.darefox:cobaltik:1.0.0")
     implementation("commons-io:commons-io:2.15.1")
+
 }
 
 tasks.test {

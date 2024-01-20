@@ -4,6 +4,8 @@ import co.touchlab.stately.concurrency.AtomicInt
 import com.kotlindiscord.kord.extensions.events.EventContext
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.utils.respond
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import dev.kord.core.behavior.edit
 import dev.kord.core.entity.Message
 import dev.kord.core.event.message.MessageCreateEvent
@@ -90,21 +92,24 @@ class MessageListener : LoggerExtension("MessageListener") {
     ) {
         botMessage.editText("Downloading media...".toSingleCodeLineMarkdown())
 
-        val response = try {
-            streamInternetFile(streamResponse.streamUrl)
-        } catch (e: IOException) {
-            botMessage.delete("Error")
-            event.message.sendErrorAsEmbed(e)
-            return
+        val response = streamInternetFile(streamResponse.streamUrl)
+        when (response) {
+            is Failure -> {
+                botMessage.delete("Error")
+                event.message.sendErrorAsEmbed(response.reason)
+            }
+            is Success -> {
+                botMessage.edit {
+                    content = null
+                    addFile(response.value.filename, ChannelProvider { response.value.stream.toByteReadChannel() })
+                }
+                event.message.edit {
+                    suppressEmbeds = true
+                }
+            }
         }
 
-        botMessage.edit {
-            content = null
-            addFile(response.filename, ChannelProvider { response.stream.toByteReadChannel() })
-        }
-        event.message.edit {
-            suppressEmbeds = true
-        }
+
     }
 
     private suspend fun EventContext<MessageCreateEvent>.redirect(
@@ -168,13 +173,13 @@ class MessageListener : LoggerExtension("MessageListener") {
         addFile: (String, ChannelProvider) -> Unit
     ) {
         for (image in chunk) {
-            try {
-                val response = streamInternetFile(image.url)
-                addFile(response.filename, ChannelProvider { response.stream.toByteReadChannel() })
-            } catch (e: Exception) {
-                log.error(e) { "error during downloading media" }
-                if (errorCounter.get() == 0) botMessage.editText( "$stopSignEmoji I couldn't download all media".toSingleCodeLineMarkdown())
-                errorCounter.incrementAndGet()
+            when(val response = streamInternetFile(image.url)) {
+                is Success -> addFile(response.value.filename, ChannelProvider { response.value.stream.toByteReadChannel() })
+                is Failure -> {
+                    log.error { "Error during downloading media: " + response.reason }
+                    if (errorCounter.get() == 0) botMessage.editText( "$stopSignEmoji I couldn't download all media".toSingleCodeLineMarkdown())
+                    errorCounter.incrementAndGet()
+                }
             }
         }
     }
