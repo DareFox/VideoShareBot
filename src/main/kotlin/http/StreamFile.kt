@@ -3,6 +3,7 @@ package http
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import extensions.ResultMonad
+import extensions.fold
 import extensions.toSafeFilename
 import extensions.tryAsResult
 import org.apache.commons.io.input.CountingInputStream
@@ -22,13 +23,11 @@ data class StreamFile(
 fun streamInternetFile(getUrl: String): ResultMonad<StreamFile, Exception> = streamInternetFile(Request(Method.GET, getUrl))
 
 fun streamInternetFile(request: Request): ResultMonad<StreamFile, Exception> {
-    val response = tryAsResult<Response, IOException> { HttpStreamingClient(request) }.let {
-        when (it) {
-            is Failure -> return it
-            is Success -> it.value
-        }
-    }
-
+    val response = tryAsResult<Response, IOException> { HttpStreamingClient(request) }
+        .fold(
+            ifSuccess = { value },
+            ifFailure = { return this }
+        )
 
     val contentDisposition = response.header("Content-Disposition")
     val contentType = response.header("Content-Type")
@@ -36,12 +35,10 @@ fun streamInternetFile(request: Request): ResultMonad<StreamFile, Exception> {
         contentDisposition != null -> contentDespositionFilename(contentDisposition)
         contentType != null -> contentTypeFilename(contentType, request.uri.toString())
         else -> return Failure(IOException("No candidates for filename"))
-    }.let {
-        when (it) {
-            is Failure -> return Failure(IOException(it.reason))
-            is Success -> it.value
-        }
-    }
+    }.fold(
+        ifSuccess = { value },
+        ifFailure = { return Failure(IOException(reason)) }
+    )
 
 
     return Success(StreamFile(
