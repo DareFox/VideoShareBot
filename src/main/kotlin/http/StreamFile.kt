@@ -6,10 +6,13 @@ import io.ktor.http.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.errors.*
 import io.ktor.utils.io.jvm.javaio.*
+import org.apache.commons.io.input.CountingInputStream
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.routing.body
 import java.io.ByteArrayInputStream
+import java.io.InputStream
 import java.net.URL
 import java.util.stream.Collectors
 import kotlin.streams.toList
@@ -17,7 +20,8 @@ import kotlin.streams.toList
 data class StreamFile(
     val response: Response,
     val filename: String,
-    val stream: ByteReadChannel
+    val size: Long?,
+    val stream: CountingInputStream
 )
 
 fun streamInternetFile(getUrl: String): StreamFile = streamInternetFile(Request(Method.GET, getUrl))
@@ -33,7 +37,12 @@ fun streamInternetFile(request: Request): StreamFile {
         else -> throw IOException("No candidates for filename")
     }
 
-    return StreamFile(response, filename, response.body.stream.toByteReadChannel())
+    return StreamFile(
+        response = response,
+        filename = filename,
+        size = response.header("Content-Length")?.toLongOrNull(),
+        stream = CountingInputStream(response.body.stream)
+    )
 }
 
 private fun contentDespositionFilename(contentDisposition: String): String {

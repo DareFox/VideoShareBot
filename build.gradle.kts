@@ -32,6 +32,7 @@ dependencies {
 
     // Other
     implementation("me.darefox:cobaltik:1.0.0")
+    implementation("commons-io:commons-io:2.15.1")
 }
 
 tasks.test {

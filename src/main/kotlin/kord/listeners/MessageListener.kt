@@ -14,6 +14,7 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.utils.io.errors.*
+import io.ktor.utils.io.jvm.javaio.*
 import match.*
 import match.services.*
 import me.darefox.cobaltik.models.PickerItem
@@ -99,7 +100,7 @@ class MessageListener : LoggerExtension("MessageListener") {
 
         botMessage.edit {
             content = null
-            addFile(response.filename, ChannelProvider { response.stream })
+            addFile(response.filename, ChannelProvider { response.stream.toByteReadChannel() })
         }
         event.message.edit {
             suppressEmbeds = true
@@ -169,7 +170,7 @@ class MessageListener : LoggerExtension("MessageListener") {
         for (image in chunk) {
             try {
                 val response = streamInternetFile(image.url)
-                addFile(response.filename, ChannelProvider { response.stream })
+                addFile(response.filename, ChannelProvider { response.stream.toByteReadChannel() })
             } catch (e: Throwable) {
                 log.error(e) { "error during downloading media" }
                 if (errorCounter.get() == 0) botMessage.editText( "$stopSignEmoji I couldn't download all media".toSingleCodeLineMarkdown())
