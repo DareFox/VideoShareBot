@@ -1,4 +1,4 @@
-package listeners
+package kord.listeners
 
 import MimeMap
 import co.touchlab.stately.concurrency.AtomicInt
