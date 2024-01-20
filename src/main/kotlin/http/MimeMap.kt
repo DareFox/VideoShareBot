@@ -1,3 +1,5 @@
+package http
+
 val MimeMap = mapOf<String, String>(
     "audio/aac" to ".aac",
     "audio/mpeg" to ".mp3",

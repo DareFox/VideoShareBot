@@ -1,21 +1,12 @@
 package http
 
-import MimeMap
 import extensions.toSafeFilename
-import io.ktor.http.*
-import io.ktor.utils.io.*
 import io.ktor.utils.io.errors.*
-import io.ktor.utils.io.jvm.javaio.*
 import org.apache.commons.io.input.CountingInputStream
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.routing.body
-import java.io.ByteArrayInputStream
-import java.io.InputStream
 import java.net.URL
-import java.util.stream.Collectors
-import kotlin.streams.toList
 
 data class StreamFile(
     val response: Response,
