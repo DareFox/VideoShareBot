@@ -1,8 +1,9 @@
 import com.kotlindiscord.kord.extensions.ExtensibleBot
+import dev.kord.common.entity.PresenceStatus
 import dev.kord.gateway.Intent
 import dev.kord.gateway.Intents
 import dev.kord.gateway.NON_PRIVILEGED
-import listeners.MessageListener
+import kord.listeners.MessageListener
 
 
 suspend fun main(args: Array<String>) {
@@ -14,6 +15,10 @@ suspend fun main(args: Array<String>) {
         }
         extensions {
             add(::MessageListener)
+        }
+        presence {
+            status = PresenceStatus.DoNotDisturb
+            competing("чате с ссылками")
         }
     }
 
