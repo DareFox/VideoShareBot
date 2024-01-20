@@ -6,7 +6,7 @@ import dev.kord.core.kordLogger
 import dev.kord.rest.builder.message.create.embed
 import io.ktor.util.logging.*
 
-suspend fun Message.sendErrorAsEmbed(err: Throwable) {
+suspend fun Message.sendErrorAsEmbed(err: Exception) {
     respond {
         embed {
             title = "ERROR"
