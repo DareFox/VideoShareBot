@@ -171,7 +171,7 @@ class MessageListener : LoggerExtension("MessageListener") {
             try {
                 val response = streamInternetFile(image.url)
                 addFile(response.filename, ChannelProvider { response.stream.toByteReadChannel() })
-            } catch (e: Throwable) {
+            } catch (e: Exception) {
                 log.error(e) { "error during downloading media" }
                 if (errorCounter.get() == 0) botMessage.editText( "$stopSignEmoji I couldn't download all media".toSingleCodeLineMarkdown())
                 errorCounter.incrementAndGet()
