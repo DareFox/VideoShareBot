@@ -33,3 +33,24 @@ inline fun <T, reified E: Exception> tryAsResult(block: () -> T): ResultMonad<T,
         }
     }
 }
+
+/**
+ * Applies the provided transformation functions based on the result type of the [ResultMonad].
+ *
+ * @param ifSuccess A lambda expression to be applied if the [ResultMonad] is a [Success].
+ *                   The lambda receives a [Success] instance and returns a result of type [R].
+ * @param ifFailure A lambda expression to be applied if the [ResultMonad] is a [Failure].
+ *                   The lambda receives a [Failure] instance and returns a result of type [R].
+ * @return The result of applying the appropriate transformation based on the [ResultMonad] type.
+ *
+ * @param T The type of the value encapsulated by [Success].
+ * @param F The type of the error encapsulated by [Failure].
+ * @param R The type of the result produced by the transformation functions.
+ * @return The result of applying the transformation functions.
+ */
+inline fun <T, F, R> ResultMonad<T,F>.fold(ifSuccess: Success<T>.() -> R, ifFailure: Failure<F>.() -> R): R {
+    return when(this) {
+        is Failure -> ifFailure(this)
+        is Success -> ifSuccess(this)
+    }
+}
