@@ -1,4 +1,4 @@
-package listeners
+package kord.listeners
 
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import io.github.oshai.kotlinlogging.KotlinLogging
