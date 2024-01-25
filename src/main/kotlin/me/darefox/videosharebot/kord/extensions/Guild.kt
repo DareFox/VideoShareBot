@@ -1,8 +1,4 @@
-<<<<<<<< Updated upstream:src/main/kotlin/me/darefox/videosharebot/extensions/Guild.kt
-package me.darefox.videosharebot.extensions
-========
 package me.darefox.videosharebot.kord.extensions
->>>>>>>> Stashed changes:src/main/kotlin/me/darefox/videosharebot/kord/extensions/Guild.kt
 
 import dev.kord.common.entity.PremiumTier
 import dev.kord.core.entity.Guild
