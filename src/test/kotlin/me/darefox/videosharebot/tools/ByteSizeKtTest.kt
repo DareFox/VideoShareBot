@@ -32,7 +32,7 @@ class ByteSizeKtTest {
 
     private val terabyteList = gigabyteList.map {
         val newSize = ByteSize(it.byteSize.bytes * 1000)
-        it.copy(byteUnit = ByteUnit.Terabyte, shoudlBePrefix = "GB", byteSize = newSize)
+        it.copy(byteUnit = ByteUnit.Terabyte, shoudlBePrefix = "TB", byteSize = newSize)
     }
 
     private val allList = listOf(kilobyteList, megabyteList, gigabyteList, terabyteList).flatten()
