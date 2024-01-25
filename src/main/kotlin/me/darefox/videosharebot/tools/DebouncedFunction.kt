@@ -8,8 +8,9 @@ class DebouncedFunction<T>(private val delayDuration: Duration, private val func
     private val scope = CoroutineScope(context = Dispatchers.Default)
     private val mutex = Mutex()
 
-    private var lastValue: T? = null
-        set(value) {
+
+    var lastValue: T? = null
+        private set(value) {
             field = value
             assigned = true
         }
