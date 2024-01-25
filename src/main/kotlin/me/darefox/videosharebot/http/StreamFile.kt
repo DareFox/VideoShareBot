@@ -20,7 +20,8 @@ data class StreamFile(
     val stream: CountingInputStream
 )
 
-fun streamInternetFile(getUrl: String): ResultMonad<StreamFile, Exception> = streamInternetFile(Request(Method.GET, getUrl))
+fun streamInternetFile(getUrl: String): ResultMonad<StreamFile, Exception> =
+    streamInternetFile(Request(Method.GET, getUrl))
 
 fun streamInternetFile(request: Request): ResultMonad<StreamFile, Exception> {
     val response = tryAsResult<Response, IOException> { HttpStreamingClient(request) }
@@ -43,11 +44,11 @@ fun streamInternetFile(request: Request): ResultMonad<StreamFile, Exception> {
 
     return Success(
         StreamFile(
-        response = response,
-        filename = filename,
-        size = response.header("Content-Length")?.toLongOrNull(),
-        stream = CountingInputStream(response.body.stream)
-    )
+            response = response,
+            filename = filename,
+            size = response.header("Content-Length")?.toLongOrNull(),
+            stream = CountingInputStream(response.body.stream)
+        )
     )
 }
 
@@ -61,4 +62,3 @@ private fun contentTypeFilename(contentType: String, url: String): ResultMonad<S
     val extension = MimeMap[contentType] ?: return Failure("$contentType is not supported media")
     val baseFilename = URL(url).toSafeFilename()
     return Success(baseFilename + extension)
-}

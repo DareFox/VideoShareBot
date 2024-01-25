@@ -11,8 +11,8 @@ object YoutubeShortsMatcher : UrlMatcher() {
         baseDomains = listOf("youtube.com"),
         subdomains = listOf("", "www"),
         segmentMatchers = nestedListOf(
-            SpecificText(shouldBe = "shorts"),
-            TextLength(length = 11)
+           SpecificText(shouldBe = "shorts"),
+           TextLength(length = 11)
         )
     )
 }
