@@ -19,7 +19,8 @@ fun interface UrlSegmentMatcher {
      */
     fun validate(text: String): Boolean
 }
-class SpecificText(val shouldBe: String, val ignoreCase: Boolean = false): UrlSegmentMatcher {
+class SpecificText(val shouldBe: String, val ignoreCase: Boolean = false):
+    UrlSegmentMatcher {
     override fun validate(text: String): Boolean = text.equals(shouldBe, false)
 }
 
@@ -35,7 +36,8 @@ object Anything: UrlSegmentMatcher {
     override fun validate(text: String): Boolean = true
 }
 
-class TextStartsWith(val prefix: String, val ignoreCase: Boolean = false): UrlSegmentMatcher {
+class TextStartsWith(val prefix: String, val ignoreCase: Boolean = false):
+    UrlSegmentMatcher {
     override fun validate(text: String): Boolean = text.startsWith(prefix, ignoreCase)
 }
 
@@ -46,7 +48,8 @@ class NumberLength(val numberOfDigits: Int): UrlSegmentMatcher {
     }
 }
 
-class CombinedMatcher(vararg val matchers: UrlSegmentMatcher): UrlSegmentMatcher {
+class CombinedMatcher(vararg val matchers: UrlSegmentMatcher):
+    UrlSegmentMatcher {
     override fun validate(text: String): Boolean {
         matchers.firstOrNull { it.validate(text) } ?: return false
         return true
