@@ -7,9 +7,11 @@ import dev.kord.gateway.Intents
 import dev.kord.gateway.NON_PRIVILEGED
 import me.darefox.videosharebot.kord.listeners.MessageListener
 
+lateinit var _bot: ExtensibleBot
+val bot by lazy { _bot }
 
 suspend fun main(args: Array<String>) {
-    val bot = ExtensibleBot(EnvironmentConfig.discordToken) {
+    _bot = ExtensibleBot(EnvironmentConfig.discordToken) {
         intents {
             +Intents.NON_PRIVILEGED
             +Intent.GuildMessages
@@ -24,5 +26,5 @@ suspend fun main(args: Array<String>) {
         }
     }
 
-    bot.start()
+    _bot.start()
 }
