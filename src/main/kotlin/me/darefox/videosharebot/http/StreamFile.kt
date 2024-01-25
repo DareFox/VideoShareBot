@@ -62,3 +62,4 @@ private fun contentTypeFilename(contentType: String, url: String): ResultMonad<S
     val extension = MimeMap[contentType] ?: return Failure("$contentType is not supported media")
     val baseFilename = URL(url).toSafeFilename()
     return Success(baseFilename + extension)
+}
