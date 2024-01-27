@@ -28,7 +28,7 @@ fun ByteSize.toString(
 
     val afterDotSymbol = if (leadingZeros) '0' else '#'
     val pattern = buildString {
-        append("#.0")
+        append("0.0")
         repeat(precision - 1) { append(afterDotSymbol) }
     }
 
