@@ -6,6 +6,7 @@ import com.kotlindiscord.kord.extensions.utils.respond
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import dev.kord.core.event.message.MessageCreateEvent
+import kotlinx.coroutines.*
 import me.darefox.videosharebot.extensions.asInlineCode
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.match.*
@@ -31,12 +32,17 @@ class MessageListener : LoggerExtension("MessageListener") {
     override suspend fun setup() {
         event<MessageCreateEvent> {
             action {
-                actionImpl()
+                val scope = CoroutineScope(Dispatchers.IO + CoroutineName("$name-Scope"))
+                try {
+                    scope.launch { actionImpl(scope) }.join()
+                } finally {
+                    scope.cancel()
+                }
             }
         }
     }
 
-    private suspend fun EventContext<MessageCreateEvent>.actionImpl() {
+    private suspend fun EventContext<MessageCreateEvent>.actionImpl(scope: CoroutineScope) {
         if (event.member?.isBot == true) return
         val parsedUrls = compositeParser.parse(event.message.content)
 
@@ -63,3 +69,4 @@ class MessageListener : LoggerExtension("MessageListener") {
         }
 
     }
+}
