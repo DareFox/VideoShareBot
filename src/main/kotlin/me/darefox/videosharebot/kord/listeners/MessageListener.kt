@@ -55,7 +55,7 @@ class MessageListener : LoggerExtension("MessageListener") {
             useReply = true
         )
 
-        val botMessageStatus = BotMessageStatus(botMessage)
+        val botMessageStatus = BotMessageStatus(botMessage, scope)
 
         log.info { "Trying to ask cobalt for $url" }
         val client = Cobalt("https://co.wuk.sh/")
