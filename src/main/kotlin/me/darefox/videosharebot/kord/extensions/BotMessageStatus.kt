@@ -2,14 +2,21 @@ package me.darefox.videosharebot.kord.extensions
 
 import dev.kord.core.behavior.edit
 import dev.kord.core.entity.Message
-import me.darefox.videosharebot.tools.DebouncedFunction
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
+import kotlinx.coroutines.CoroutineScope
+import me.darefox.videosharebot.tools.throttleFuncArg
+import kotlin.time.Duration.Companion.milliseconds
 
-class BotMessageStatus(private val message: Message) {
-    private val debouncedFunction = DebouncedFunction(500.toDuration(DurationUnit.MILLISECONDS)) { status: String? ->
+class BotMessageStatus(private val message: Message, private val scope: CoroutineScope) {
+    var status: String = message.content
+        get() = field
+        set(value) {
+            throttled(value)
+            field = value
+        }
+
+    private val throttled = scope.throttleFuncArg<String>(100.milliseconds, true) {
         message.edit {
-            content = status
+            content = it
         }
     }
 
@@ -19,8 +26,4 @@ class BotMessageStatus(private val message: Message) {
             "Message is not made by me, but ${author.username}"
         }
     }
-
-    var status: String?
-        get() = debouncedFunction.lastValue
-        set(value) { debouncedFunction.run(value) }
 }
