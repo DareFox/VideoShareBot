@@ -20,11 +20,11 @@ import kotlin.time.Duration
  *
  * @param T The type of the argument passed to the throttled function.
  */
-class ThrottledArgumentFunction<T>(
+class ThrottledFunction<T> (
     scope: CoroutineScope,
     private val delayDuration: Duration,
     private val uniqueArguments: Boolean,
-    private val function: suspend (T) -> Unit,
+    private val function: suspend (T) -> Unit
 ) : (T) -> Unit {
     private val sharedFlow: MutableSharedFlow<T> =
         MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_LATEST)
@@ -34,7 +34,7 @@ class ThrottledArgumentFunction<T>(
         sharedFlow
     }
 
-    private val job = scope.launch(CoroutineName("ThrottledArgumentFunction-Loop")) { jobLoop() }
+    private val job = scope.launch(CoroutineName("ThrottledFunction")) { jobLoop() }
     private suspend fun jobLoop() {
         while (true) {
             collectFlow.collect {
@@ -60,30 +60,19 @@ class ThrottledArgumentFunction<T>(
  * @param delayDuration The duration to delay between invocations of [function].
  * @param function The suspend function to be throttled.
  */
-class ThrottledFunction(
+class ThrottledNoArgFunction(
     private val scope: CoroutineScope,
     private val delayDuration: Duration,
     private val function: suspend () -> Unit
 ) : () -> Unit {
-    @Volatile
-    private var counter: Int = 0
-
-    private val job = scope.launch(CoroutineName("ThrottledFunction")) {
-        var previous = counter
-        while (true) {
-            val now = counter
-            if (now == previous) {
-                yield()
-            } else {
-                function()
-                delay(delayDuration)
-            }
-            previous = now
-        }
-    }
+    private val throttledUnit = ThrottledFunction<Unit>(
+        scope = scope,
+        delayDuration = delayDuration,
+        uniqueArguments = false
+    ) { function() }
 
     override fun invoke() {
-        counter++
+        throttledUnit.invoke(Unit)
     }
 }
 
@@ -103,7 +92,7 @@ fun <T> CoroutineScope.throttleFuncArg(
     uniqueArguments: Boolean,
     function: suspend (T) -> Unit
 ): (T) -> Unit {
-    return ThrottledArgumentFunction(this, delayDuration, uniqueArguments, function)
+    return ThrottledFunction(this, delayDuration, uniqueArguments, function)
 }
 
 /**
@@ -115,5 +104,5 @@ fun <T> CoroutineScope.throttleFuncArg(
  * @return A throttled version of the provided suspend function.
  */
 fun CoroutineScope.throttleFunc(delayDuration: Duration, function: suspend () -> Unit): () -> Unit {
-    return ThrottledFunction(this, delayDuration, function)
+    return ThrottledNoArgFunction(this, delayDuration, function)
 }
