@@ -7,7 +7,7 @@ import java.net.URL
  * Class for matching URLs based on specific patterns.
  */
 abstract class UrlMatcher {
-    private val supportedProtocols = listOf("https", "me/darefox/videosharebot/http")
+    private val supportedProtocols = listOf("https", "http")
 
     /**
      * Regular expression used to match any URLs
