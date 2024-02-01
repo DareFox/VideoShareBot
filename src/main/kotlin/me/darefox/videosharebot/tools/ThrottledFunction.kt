@@ -27,7 +27,7 @@ class ThrottledFunction<T> (
     private val function: suspend (T) -> Unit
 ) : (T) -> Unit {
     private val sharedFlow: MutableSharedFlow<T> =
-        MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_LATEST)
+        MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val collectFlow = if (uniqueArguments) {
         sharedFlow.distinctUntilChanged()
     } else {
