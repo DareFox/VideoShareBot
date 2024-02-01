@@ -33,14 +33,21 @@ class ThrottledFunctionTest {
             "delay($shouldDelay) call delayed for $delayedFor with a bigger error margin: \n Extra delay ($extraDelay) > Maximum error margin ($maxErrorMargin)"
         }
     }
+    data class ThrottleCreateData(
+        val shouldCall: suspend () -> Unit,
+        val throttleDelay: Duration,
+    )
 
-    private fun <T> testErrorMargin(create: (Pair<() -> Unit, Duration>) -> T, call: (T) -> Unit) {
-        for (shouldDelayFor in delays) {
+    private fun <T> testErrorMargin(
+        create: (ThrottleCreateData) -> T,
+        call: (T) -> Unit
+    ) {
+        for (throttleDelay in delays) {
             var previousCall = TimeSource.Monotonic.markNow()
             val lastCall = MutableStateFlow<TimeSource.Monotonic.ValueTimeMark?>(null)
 
             var counter = 0
-            val shouldCall = {
+            val shouldCall = suspend {
                 if (counter >= 3) /* warmup */ {
                     if (lastCall.value == null)
                         lastCall.value = TimeSource.Monotonic.markNow()
@@ -49,14 +56,18 @@ class ThrottledFunctionTest {
                     previousCall = TimeSource.Monotonic.markNow()
                 }
             }
-            val func = create(shouldCall to shouldDelayFor)
+
+            val func = create(ThrottleCreateData(
+                shouldCall = shouldCall,
+                throttleDelay = throttleDelay
+            ))
 
             while (true) {
                 call(func)
                 val time = lastCall.value
                 if (time != null) {
                     val delayedFor = time - previousCall
-                    assertInErrorMargin(shouldDelayFor, delayedFor)
+                    assertInErrorMargin(throttleDelay, delayedFor)
                     break
                 }
             }
@@ -66,17 +77,25 @@ class ThrottledFunctionTest {
     @Test
     fun `Delay time of empty argument function should be in error margin`() {
         testErrorMargin(
-            create = { (shouldCall, delay) -> scope.throttleFunc(delay, shouldCall) },
+            create = { (shouldCall, delay) -> scope.throttleFunc(
+                delayDuration = delay,
+                delayMode = DelayMode.NORMAL_DELAY,
+                function = shouldCall
+            ) },
             call = { func -> func() }
         )
     }
 
     @Test
-    fun `Delay time of unique argument function should be in error margin`() {
+    fun `Delay time of function with ONLY_UNIQUE_ARGUMENTS flag should be in error margin`() {
         var counter = 0
         testErrorMargin(
             create = { (shouldCall, delay) ->
-                scope.throttleFuncArg<Int>(delay, uniqueArguments = true) {
+                scope.throttleFuncArg<Int>(
+                    delayDuration = delay,
+                    argumentsMode = ArgumentsMode.ONLY_UNIQUE_ARGUMENTS,
+                    delayMode = DelayMode.NORMAL_DELAY
+                ) {
                     shouldCall()
                     counter++
                 }
@@ -86,10 +105,14 @@ class ThrottledFunctionTest {
     }
 
     @Test
-    fun `Delay time of not unique argument function should be in error margin`() {
+    fun `Delay time of function ANY_ARGUMENTS should be in error margin`() {
         testErrorMargin(
             create = { (shouldCall, delay) ->
-                scope.throttleFuncArg<Unit>(delay, uniqueArguments = false) {
+                scope.throttleFuncArg<Unit>(
+                    delay,
+                    argumentsMode = ArgumentsMode.ANY_ARGUMENTS,
+                    delayMode = DelayMode.NORMAL_DELAY
+                ) {
                     shouldCall()
                 }
             },
@@ -98,12 +121,16 @@ class ThrottledFunctionTest {
     }
 
     @Test
-    fun `Throttled function with uniqueArguments flag should filter out same values`() {
+    fun `Throttled function with ONLY_UNIQUE_ARGUMENTS flag should filter out same values`() {
         val notUnique = mutableListOf(0, 0, 1, 2, 3, 4, 4, 42, 42, 123, 123, 222_222, 222_222, 96)
         val uniqueList = notUnique.toSet().toList()
         val actualList = mutableListOf<Int>()
 
-        val func = scope.throttleFuncArg<Int>(1.milliseconds, uniqueArguments = true) {
+        val func = scope.throttleFuncArg<Int>(
+            delayDuration = 1.milliseconds,
+            delayMode = DelayMode.DELAY_MINUS_PROCESS_TIME,
+            argumentsMode = ArgumentsMode.ONLY_UNIQUE_ARGUMENTS
+        ) {
             actualList += it
         }
 
@@ -118,11 +145,15 @@ class ThrottledFunctionTest {
         )
     }
 
-    private fun testOnlyUniqueValues(uniqueArguments: Boolean) {
+    private fun testOnlyUniqueValues(argumentFlag: ArgumentsMode) {
         val shouldHaveList = mutableListOf<Int>()
         val actualList = mutableListOf<Int>()
 
-        val func = scope.throttleFuncArg<Int>(1.milliseconds, uniqueArguments = uniqueArguments) {
+        val func = scope.throttleFuncArg<Int>(
+            1.milliseconds,
+            delayMode = DelayMode.DELAY_MINUS_PROCESS_TIME,
+            argumentsMode = argumentFlag
+        ) {
             actualList += it
         }
 
@@ -139,12 +170,12 @@ class ThrottledFunctionTest {
     }
 
     @Test
-    fun `Throttled function with uniqueArguments flag should accepts unique values`() {
-        testOnlyUniqueValues(uniqueArguments = true)
+    fun `Throttled function with ONLY_UNIQUE_ARGUMENTS flag should accepts unique values`() {
+        testOnlyUniqueValues(ArgumentsMode.ONLY_UNIQUE_ARGUMENTS)
     }
 
     @Test
-    fun `Throttled function with uniqueArguments false should accepts all values`() {
-        testOnlyUniqueValues(uniqueArguments = false)
+    fun `Throttled function with ANY_ARGUMENTS flag should accepts all values`() {
+        testOnlyUniqueValues(ArgumentsMode.ANY_ARGUMENTS)
     }
 }
