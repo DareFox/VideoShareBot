@@ -145,6 +145,6 @@ class ThrottledFunctionTest {
 
     @Test
     fun `Throttled function with uniqueArguments false should accepts all values`() {
-        testOnlyUniqueValues(uniqueArguments = true)
+        testOnlyUniqueValues(uniqueArguments = false)
     }
 }
