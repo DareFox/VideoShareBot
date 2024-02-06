@@ -70,7 +70,9 @@ suspend fun uploadPicker(
             return
         }
 
-        if (currentChunk.sumOf { it.first.size } + newItem.first.size >= maxSizeIncluding) {
+        val isExceedingSizeLimitIfAddFile = currentChunk.sumOf { it.first.size } + newItem.first.size >= maxSizeIncluding
+        val isChunkFull = currentChunk.size == 10
+        if (isChunkFull || isExceedingSizeLimitIfAddFile) {
             sendChunk(currentChunk)
             currentChunk.clear()
         }
