@@ -1,4 +1,4 @@
-package me.darefox.videosharebot
+package me.darefox.videosharebot.http
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -9,14 +9,15 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalSerializationApi::class)
-val ktor = HttpClient(CIO) {
+val KtorHttp = HttpClient(CIO) {
     install(ContentNegotiation) {
         json(Json {
             explicitNulls = false
         })
     }
     install(HttpTimeout) {
-        requestTimeoutMillis = 45000;
-        connectTimeoutMillis = 10000;
+        requestTimeoutMillis = Long.MAX_VALUE;
+        connectTimeoutMillis = 15000;
+        socketTimeoutMillis = 10000;
     }
 }
