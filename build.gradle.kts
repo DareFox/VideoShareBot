@@ -8,7 +8,6 @@ plugins {
 group = "me.darefox"
 version = "1.0-SNAPSHOT"
 
-// Discord API version
 val kordExtVersion = "1.6.0"
 val ktorVersion = "2.3.7"
 
@@ -20,7 +19,8 @@ dependencies {
     testImplementation(kotlin("test"))
 
     // Logger
-    implementation("org.slf4j:slf4j-simple:2.0.3")
+    implementation("org.slf4j:slf4j-api:2.0.11")
+    implementation("ch.qos.logback:logback-classic:1.4.14")
     implementation("io.github.oshai:kotlin-logging:5.0.1")
 
     // Discord API
@@ -51,5 +51,5 @@ kotlin {
 }
 
 application {
-    mainClass.set("MainKt")
+    mainClass.set("me.darefox.videosharebot.MainKt")
 }
