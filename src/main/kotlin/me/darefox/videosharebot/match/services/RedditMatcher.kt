@@ -1,6 +1,5 @@
 package me.darefox.videosharebot.match.services
 
-import match.*
 import me.darefox.videosharebot.match.*
 
 object RedditMatcher: UrlMatcher() {
