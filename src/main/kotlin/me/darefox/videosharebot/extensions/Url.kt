@@ -1,8 +1,8 @@
 package me.darefox.videosharebot.extensions
 
 import java.net.MalformedURLException
-import java.net.URI
 import java.net.URL
+
 fun String.tryParseURL(): URL? {
     return try {
         URL(this)
