@@ -3,9 +3,9 @@ package me.darefox.videosharebot.kord.extensions
 import dev.kord.core.behavior.edit
 import dev.kord.core.entity.Message
 import dev.kord.rest.builder.message.embed
+import io.ktor.util.logging.*
 import me.darefox.videosharebot.extensions.asCodeBlock
 import me.darefox.videosharebot.extensions.asInlineCode
-import io.ktor.util.logging.*
 import mu.KotlinLogging
 
 suspend inline fun Message.changeToExceptionError(e: Exception): Message {

@@ -1,7 +1,6 @@
 package me.darefox.videosharebot.match.services
 
 import me.darefox.videosharebot.match.*
-import me.darefox.videosharebot.match.UrlPattern
 
 object VkMatcher: UrlMatcher() {
     override val pattern = UrlPattern(

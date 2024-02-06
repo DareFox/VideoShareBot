@@ -6,7 +6,6 @@ import kotlinx.coroutines.*
 import me.darefox.videosharebot.tools.ArgumentsMode
 import me.darefox.videosharebot.tools.DelayMode
 import me.darefox.videosharebot.tools.throttleFuncArg
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class BotMessageStatus(private val message: Message, private val scope: CoroutineScope) {
