@@ -17,10 +17,10 @@ object CobaltResponseFactory {
         botMessageStatus: BotMessageStatus
     ) {
         when (response) {
-            is PickerResponse -> TODO()
-            is RedirectResponse -> TODO()
-            is StreamResponse -> TODO()
-            else -> TODO()
+            is PickerResponse -> uploadPicker(response, botMessage, botMessageStatus)
+            is RedirectResponse -> uploadRedirect(response, botMessage)
+            is StreamResponse -> uploadStream(response, botMessage, botMessageStatus)
+            else -> botMessageStatus.status == "$response is not supported"
         }
     }
 
