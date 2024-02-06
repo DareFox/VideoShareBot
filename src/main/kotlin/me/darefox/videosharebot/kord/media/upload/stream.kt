@@ -25,6 +25,7 @@ import org.apache.commons.io.input.CountingInputStream
 
 suspend fun uploadStream(
     response: StreamResponse,
+    userMessage: Message,
     botMessage: Message,
     botMessageStatus: BotMessageStatus
 ) = withContext(Dispatchers.IO) {
@@ -60,6 +61,9 @@ suspend fun uploadStream(
                 })
             }
             botMessageStatus.status = ""
+            userMessage.edit {
+                suppressEmbeds = true
+            }
         }
     }
 }
