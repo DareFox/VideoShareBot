@@ -5,6 +5,7 @@ import me.darefox.cobaltik.wrapper.PickerResponse
 import me.darefox.cobaltik.wrapper.RedirectResponse
 import me.darefox.cobaltik.wrapper.StreamResponse
 import me.darefox.cobaltik.wrapper.WrappedCobaltResponse
+import me.darefox.videosharebot.kord.extensions.BotMessage
 import me.darefox.videosharebot.kord.extensions.BotMessageStatus
 import me.darefox.videosharebot.match.CompositeMatcherResult
 import me.darefox.videosharebot.match.services.InstagramMatcher
@@ -15,7 +16,7 @@ object CobaltResponseFactory {
         parsedResult: CompositeMatcherResult,
         response: WrappedCobaltResponse,
         userMessage: Message,
-        botMessage: Message,
+        botMessage: BotMessage,
         botMessageStatus: BotMessageStatus
     ) {
         when (response) {

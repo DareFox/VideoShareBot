@@ -17,7 +17,9 @@ import me.darefox.videosharebot.extensions.asInlineCode
 import me.darefox.videosharebot.extensions.filename
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.http.requestFile
+import me.darefox.videosharebot.kord.extensions.BotMessage
 import me.darefox.videosharebot.kord.extensions.BotMessageStatus
+import me.darefox.videosharebot.kord.extensions.asBotMessage
 import me.darefox.videosharebot.kord.extensions.maxByteFileSizeOrMin
 import kotlin.math.min
 
@@ -27,7 +29,7 @@ private typealias ChunkErrorIndexed = Pair<Int, String>
 suspend fun uploadPicker(
     response: PickerResponse,
     userMessage: Message,
-    botMessage: Message,
+    botMessage: BotMessage,
     botMessageStatus: BotMessageStatus
 ) {
     if (response.type == PickerType.VARIOUS) {
@@ -35,25 +37,25 @@ suspend fun uploadPicker(
         return
     }
 
-    var replyTo: Message? = null
-    val maxSizeIncluding = botMessage.getGuildOrNull().maxByteFileSizeOrMin()
+    var replyTo: BotMessage? = null
+    val maxSizeIncluding = botMessage.ref.getGuildOrNull().maxByteFileSizeOrMin()
     val errorList = mutableListOf<ChunkErrorIndexed>()
     val currentChunk = mutableListOf<ChunkData>()
 
-    suspend fun Message.editAndUploadChunk(chunk: List<ChunkData>): Message {
-        return this.edit {
+    suspend fun BotMessage.editAndUploadChunk(chunk: List<ChunkData>): BotMessage {
+        return this.ref.edit {
             for ((data, filename) in chunk) {
                 addFile(filename, ChannelProvider { ByteReadChannel(data) })
             }
-        }
+        }.asBotMessage()
     }
 
-    suspend fun Message.replyAndUploadChunk(chunk: List<ChunkData>): Message {
-        return this.reply {
+    suspend fun BotMessage.replyAndUploadChunk(chunk: List<ChunkData>): BotMessage {
+        return this.ref.reply {
             for ((data, filename) in chunk) {
                 addFile(filename, ChannelProvider { ByteReadChannel(data) })
             }
-        }
+        }.asBotMessage()
     }
 
     suspend fun sendChunk(chunk: List<ChunkData>) {
