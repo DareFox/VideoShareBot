@@ -1,50 +1,33 @@
 package me.darefox.videosharebot.kord.media.upload
 
-import dev.kord.core.entity.Message
 import me.darefox.cobaltik.wrapper.PickerResponse
 import me.darefox.cobaltik.wrapper.RedirectResponse
 import me.darefox.cobaltik.wrapper.StreamResponse
 import me.darefox.cobaltik.wrapper.WrappedCobaltResponse
-import me.darefox.videosharebot.kord.extensions.BotMessage
-import me.darefox.videosharebot.kord.extensions.BotMessageStatus
 import me.darefox.videosharebot.match.CompositeMatcherResult
 import me.darefox.videosharebot.match.services.InstagramMatcher
 
+@Suppress("UNCHECKED_CAST")
 object CobaltResponseFactory {
     private val alwaysStream = mutableListOf(InstagramMatcher)
     suspend fun uploadMedia(
         parsedResult: CompositeMatcherResult,
-        response: WrappedCobaltResponse,
-        userMessage: Message,
-        botMessage: BotMessage,
-        botMessageStatus: BotMessageStatus
+        eventContext: UploadContext<WrappedCobaltResponse>
     ) {
-        when (response) {
-            is PickerResponse -> uploadPicker(
-                response = response,
-                userMessage = userMessage,
-                botMessage = botMessage,
-                botMessageStatus = botMessageStatus
-            )
+        when (eventContext.cobaltResponse) {
+            is PickerResponse -> uploadPicker(eventContext as UploadContext<PickerResponse>)
             is RedirectResponse -> {
+                val context = eventContext as UploadContext<RedirectResponse>
                 if (parsedResult.parser in alwaysStream) {
-                    val asStream = StreamResponse(response.redirectUrl)
-                    this.uploadMedia(parsedResult, asStream, userMessage, botMessage, botMessageStatus)
+                    val asStream = StreamResponse(context.cobaltResponse.redirectUrl)
+                    val newContext = eventContext.copy(cobaltResponse = asStream)
+                    this.uploadMedia(parsedResult, newContext)
                 } else {
-                    uploadRedirect(
-                        response = response,
-                        userMessage = userMessage,
-                        botMessage = botMessage
-                    )
+                    uploadRedirect(context)
                 }
             }
-            is StreamResponse -> uploadStream(
-                response = response,
-                userMessage = userMessage,
-                botMessage = botMessage,
-                botMessageStatus = botMessageStatus
-            )
-            else -> botMessageStatus.status == "$response is not supported"
+            is StreamResponse -> uploadStream(eventContext as UploadContext<StreamResponse>)
+            else -> eventContext.botMessageStatus.status == "${eventContext.cobaltResponse} is not supported"
         }
     }
 

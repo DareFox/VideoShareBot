@@ -26,12 +26,13 @@ import kotlin.math.min
 private typealias ChunkData = Pair<ByteArray, String>
 private typealias ChunkErrorIndexed = Pair<Int, String>
 
-suspend fun uploadPicker(
-    response: PickerResponse,
-    userMessage: Message,
-    botMessage: BotMessage,
-    botMessageStatus: BotMessageStatus
-) {
+suspend fun uploadPicker(eventContext: UploadContext<PickerResponse>) {
+    val response: PickerResponse = eventContext.cobaltResponse
+    val userMessage: Message = eventContext.userMessage
+    val botMessage: BotMessage = eventContext.botMessage
+    val botMessageStatus: BotMessageStatus = eventContext.botMessageStatus
+
+
     if (response.type == PickerType.VARIOUS) {
         botMessageStatus.status = asInlineCode("${response.type} is not supported")
         return
