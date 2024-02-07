@@ -3,7 +3,6 @@ package me.darefox.videosharebot.kord.media.upload
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import dev.kord.core.behavior.edit
-import dev.kord.core.entity.Message
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -16,7 +15,6 @@ import me.darefox.videosharebot.extensions.asInlineCode
 import me.darefox.videosharebot.extensions.filename
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.http.requestFile
-import me.darefox.videosharebot.kord.extensions.BotMessage
 import me.darefox.videosharebot.kord.extensions.BotMessageStatus
 import me.darefox.videosharebot.kord.extensions.maxByteFileSize
 import me.darefox.videosharebot.tools.ByteSize
@@ -24,12 +22,12 @@ import me.darefox.videosharebot.tools.ByteUnit
 import me.darefox.videosharebot.tools.toString
 import org.apache.commons.io.input.CountingInputStream
 
-suspend fun uploadStream(
-    response: StreamResponse,
-    userMessage: Message,
-    botMessage: BotMessage,
-    botMessageStatus: BotMessageStatus
-) = withContext(Dispatchers.IO) {
+suspend fun uploadStream(eventContext: UploadContext<StreamResponse>) = withContext(Dispatchers.IO) {
+    val response = eventContext.cobaltResponse
+    val userMessage = eventContext.userMessage
+    val botMessage = eventContext.botMessage
+    val botMessageStatus = eventContext.botMessageStatus
+
     botMessageStatus.status = asInlineCode("Starting downloading media...")
 
     lateinit var filename: String
