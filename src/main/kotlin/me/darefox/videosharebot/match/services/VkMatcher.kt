@@ -11,16 +11,10 @@ object VkMatcher: UrlMatcher() {
         subdomains = listOf(""),
         segmentMatchers = listOf(
             listOf(
-                CombinedMatcher(
-                    TextLength(23),
-                    TextStartsWith("clip-")
-                )
+                TextLength(23) and TextStartsWith("clip-")
             ),
             listOf(
-                CombinedMatcher(
-                    TextLength(24),
-                    TextStartsWith("video")
-                )
+                TextLength(24) and TextStartsWith("video")
             )
         )
     )
