@@ -51,7 +51,6 @@ class NumberLength(val numberOfDigits: Int): UrlSegmentMatcher {
 class CombinedMatcher(vararg val matchers: UrlSegmentMatcher):
     UrlSegmentMatcher {
     override fun validate(text: String): Boolean {
-        matchers.firstOrNull { it.validate(text) } ?: return false
-        return true
+        return matchers.all { it.validate(text) }
     }
 }
