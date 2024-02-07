@@ -4,12 +4,12 @@ import me.darefox.videosharebot.match.*
 
 object VkMatcher: UrlMatcher() {
     override val pattern = UrlPattern(
-        listOf("vk.com"),
-        listOf(""),
-        listOf(
+        baseDomains = listOf("vk.com"),
+        subdomains = listOf(""),
+        segmentMatchers = listOf(
             listOf(
                 CombinedMatcher(
-                    TextLength(24),
+                    TextLength(23),
                     TextStartsWith("clip-")
                 )
             ),
