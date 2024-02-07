@@ -1,6 +1,9 @@
 package me.darefox.videosharebot.match.services
 
 import me.darefox.videosharebot.match.*
+import me.darefox.videosharebot.match.segments.Anything
+import me.darefox.videosharebot.match.segments.SpecificText
+import me.darefox.videosharebot.match.segments.TextLength
 
 object RedditMatcher: UrlMatcher() {
     private val withoutId = listOf(
