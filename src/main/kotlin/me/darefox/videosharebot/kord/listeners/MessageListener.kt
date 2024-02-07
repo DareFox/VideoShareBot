@@ -17,8 +17,11 @@ import me.darefox.videosharebot.kord.extensions.changeToExceptionError
 import me.darefox.videosharebot.kord.media.upload.CobaltResponseFactory
 import me.darefox.videosharebot.match.CompositeMatcher
 import me.darefox.videosharebot.match.services.*
+import mu.KotlinLogging
+class MessageListener : Extension() {
+    override val name: String = this::class.simpleName!!
+    private val log = KotlinLogging.logger { }
 
-class MessageListener : LoggerExtension("MessageListener") {
     val compositeParser = CompositeMatcher(
         setOf(
             TikTokMatcher,
