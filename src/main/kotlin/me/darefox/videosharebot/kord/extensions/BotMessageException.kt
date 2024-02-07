@@ -8,8 +8,8 @@ import me.darefox.videosharebot.extensions.asCodeBlock
 import me.darefox.videosharebot.extensions.asInlineCode
 import mu.KotlinLogging
 
-suspend inline fun Message.changeToExceptionError(e: Exception): Message {
-    return this.edit {
+suspend inline fun BotMessage.changeToExceptionError(e: Exception): Message {
+    return this.ref.edit {
         content = null
         embed {
             title = "ERROR"

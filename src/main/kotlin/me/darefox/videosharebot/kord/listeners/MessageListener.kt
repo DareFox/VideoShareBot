@@ -12,6 +12,7 @@ import me.darefox.cobaltik.wrapper.WrappedCobaltResponse
 import me.darefox.videosharebot.extensions.asInlineCode
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.kord.extensions.BotMessageStatus
+import me.darefox.videosharebot.kord.extensions.asBotMessage
 import me.darefox.videosharebot.kord.extensions.changeToExceptionError
 import me.darefox.videosharebot.kord.media.upload.CobaltResponseFactory
 import me.darefox.videosharebot.match.CompositeMatcher
@@ -52,7 +53,7 @@ class MessageListener : LoggerExtension("MessageListener") {
             asInlineCode("Trying to find video..."),
             pingInReply = false,
             useReply = true
-        )
+        ).asBotMessage()
 
         val botMessageStatus = BotMessageStatus(botMessage, scope)
 

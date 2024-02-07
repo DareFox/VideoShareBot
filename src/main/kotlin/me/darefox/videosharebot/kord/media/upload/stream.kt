@@ -16,6 +16,7 @@ import me.darefox.videosharebot.extensions.asInlineCode
 import me.darefox.videosharebot.extensions.filename
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.http.requestFile
+import me.darefox.videosharebot.kord.extensions.BotMessage
 import me.darefox.videosharebot.kord.extensions.BotMessageStatus
 import me.darefox.videosharebot.kord.extensions.maxByteFileSize
 import me.darefox.videosharebot.tools.ByteSize
@@ -26,13 +27,13 @@ import org.apache.commons.io.input.CountingInputStream
 suspend fun uploadStream(
     response: StreamResponse,
     userMessage: Message,
-    botMessage: Message,
+    botMessage: BotMessage,
     botMessageStatus: BotMessageStatus
 ) = withContext(Dispatchers.IO) {
     botMessageStatus.status = asInlineCode("Starting downloading media...")
 
     lateinit var filename: String
-    val maxSizeIncluding = botMessage.getGuild().maxByteFileSize
+    val maxSizeIncluding = botMessage.ref.getGuild().maxByteFileSize
     val buffered = tryAsResult<ByteArray, IOException> {
         requestFile(response.streamUrl) { http ->
             val expectedSize = http.contentLength() ?: 0
@@ -55,7 +56,7 @@ suspend fun uploadStream(
                 return@withContext
             }
 
-            botMessage.edit {
+            botMessage.ref.edit {
                 addFile(filename, ChannelProvider(buffered.value.size.toLong()) {
                     ByteReadChannel(buffered.value)
                 })
