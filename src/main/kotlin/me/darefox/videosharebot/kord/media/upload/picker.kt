@@ -12,8 +12,6 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.errors.*
 import me.darefox.cobaltik.models.PickerType
 import me.darefox.cobaltik.wrapper.PickerResponse
-import me.darefox.videosharebot.extensions.asCodeBlock
-import me.darefox.videosharebot.extensions.asInlineCode
 import me.darefox.videosharebot.extensions.filename
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.http.requestFile
@@ -21,6 +19,7 @@ import me.darefox.videosharebot.kord.extensions.BotMessage
 import me.darefox.videosharebot.kord.extensions.BotMessageStatus
 import me.darefox.videosharebot.kord.extensions.asBotMessage
 import me.darefox.videosharebot.kord.extensions.maxByteFileSizeOrMin
+import me.darefox.videosharebot.tools.stringtransformers.MarkdownCodeBlock
 import kotlin.math.min
 
 private typealias ChunkData = Pair<ByteArray, String>
@@ -34,7 +33,7 @@ suspend fun uploadPicker(eventContext: UploadContext<PickerResponse>) {
 
 
     if (response.type == PickerType.VARIOUS) {
-        botMessageStatus.status = asInlineCode("${response.type} is not supported")
+        botMessageStatus.changeTo("${response.type} is not supported")
         return
     }
 
@@ -84,7 +83,7 @@ suspend fun uploadPicker(eventContext: UploadContext<PickerResponse>) {
     }
 
     for ((index, image) in response.items.withIndex()) {
-        botMessageStatus.status = asInlineCode("Finished: $index / ${response.items.size}")
+        botMessageStatus.changeTo("Finished: $index / ${response.items.size}")
         lateinit var filename: String
         val result = tryAsResult<ByteArray, IOException> {
             requestFile(image.url) {
@@ -116,10 +115,9 @@ suspend fun uploadPicker(eventContext: UploadContext<PickerResponse>) {
            stripped += "..."
         }
 
-        val newStatus = asCodeBlock(header + stripped)
-        botMessageStatus.status = newStatus
+        botMessageStatus.changeTo(header + stripped, MarkdownCodeBlock())
     } else {
         userMessage.edit { suppressEmbeds = true }
-        botMessageStatus.status = ""
+        botMessageStatus.changeTo(null)
     }
 }

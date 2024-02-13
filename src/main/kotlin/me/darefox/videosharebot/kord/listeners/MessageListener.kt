@@ -10,7 +10,6 @@ import dev.kord.core.event.message.MessageCreateEvent
 import kotlinx.coroutines.*
 import me.darefox.cobaltik.wrapper.Cobalt
 import me.darefox.cobaltik.wrapper.WrappedCobaltResponse
-import me.darefox.videosharebot.extensions.asInlineCode
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.kord.extensions.BotMessageStatus
 import me.darefox.videosharebot.kord.extensions.asBotMessage
@@ -19,6 +18,7 @@ import me.darefox.videosharebot.kord.media.upload.CobaltResponseFactory
 import me.darefox.videosharebot.kord.media.upload.UploadContext
 import me.darefox.videosharebot.match.CompositeMatcher
 import me.darefox.videosharebot.match.services.*
+import me.darefox.videosharebot.tools.stringtransformers.MarkdownCodeInline
 import mu.KotlinLogging
 
 class MessageListener : Extension() {
@@ -55,13 +55,14 @@ class MessageListener : Extension() {
         if (parsedUrls.isEmpty()) return
         val originalUrl = parsedUrls.first()
 
+        val defaultTransformer = MarkdownCodeInline
         val botMessage = event.message.respond(
-            asInlineCode("Trying to find media..."),
+            defaultTransformer("Trying to find media..."),
             pingInReply = false,
             useReply = true
         ).asBotMessage()
 
-        val botMessageStatus = BotMessageStatus(botMessage, scope)
+        val botMessageStatus = BotMessageStatus(botMessage, scope, defaultTransformer)
 
         log.info { "Trying to ask cobalt for $originalUrl" }
         val client = Cobalt("https://co.wuk.sh/")
