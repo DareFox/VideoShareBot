@@ -1,44 +1,97 @@
 package me.darefox.videosharebot.kord.extensions
 
 import dev.kord.core.behavior.edit
-import dev.kord.core.entity.Message
 import kotlinx.coroutines.*
+import me.darefox.videosharebot.extensions.createChildScope
+import me.darefox.videosharebot.extensions.onCancel
 import me.darefox.videosharebot.tools.ArgumentsMode
 import me.darefox.videosharebot.tools.DelayMode
+import me.darefox.videosharebot.tools.stringtransformers.StringTransformer
 import me.darefox.videosharebot.tools.throttleFuncArg
+import mu.KotlinLogging
 import kotlin.time.Duration.Companion.seconds
 
-class BotMessageStatus(private val message: BotMessage, private val scope: CoroutineScope) {
-    @OptIn(DelicateCoroutinesApi::class)
-    private val onCancel = scope.launch(CoroutineName("BotMessageStatus-onCancel")) {
-        try {
-            awaitCancellation()
-        } finally {
-           GlobalScope.launch { message.ref.edit { content = status } }
-        }
-    }
-
-    var status: String = message.ref.content
-        get() = field
-        set(value) {
-            throttled(value)
-            field = value
-        }
-
-    private val throttled = scope.throttleFuncArg<String>(
-        delayDuration = 1.seconds,
-        delayMode = DelayMode.DELAY_MINUS_PROCESS_TIME,
-        argumentsMode = ArgumentsMode.ONLY_UNIQUE_ARGUMENTS
-    ) {
-        message.ref.edit {
-            content = it
-        }
-    }
-
+class BotMessageStatus(
+    private val message: BotMessage,
+    private val scope: CoroutineScope,
+    override var defaultTransformer: StringTransformer,
+) : IBotMessageStatus {
     init {
         val author = requireNotNull(message.ref.author) { "Author is null" }
         require(author.isMe()) {
             "Message is not made by me, but ${author.username}"
         }
+    }
+
+    private val log = KotlinLogging.logger { }
+    private val messageEditScope = scope.createChildScope(false, Dispatchers.IO)
+
+    private suspend fun editMessage(newContent: String?) {
+        _lastEdit = newContent
+        message.ref.edit {
+            content = newContent
+        }
+    }
+    private val editMessageThrottled = messageEditScope.throttleFuncArg<String?>(
+        delayDuration = 1.seconds,
+        delayMode = DelayMode.DELAY_MINUS_PROCESS_TIME,
+        argumentsMode = ArgumentsMode.ONLY_UNIQUE_ARGUMENTS
+    ) { newContent ->
+        editMessage(newContent)
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private val onCancel = scope.onCancel(CoroutineName("BotMessageStatus-OnCancel")) {
+        log.debug { "BotMessageStatus was cancelled because ${it.message} (throwable: ${it.cause})" }
+
+        if (!isActive) return@onCancel
+        messageEditScope.cancel(it)
+
+        val value = _queued
+        if (value is MessageQueueStatus.Value) {
+            val newContent =  value.content?.let { value.transformer(it) }
+            if (newContent == _lastEdit) return@onCancel
+
+            GlobalScope.launch {
+                editMessage(newContent)
+            }
+        }
+    }
+
+    private var _lastEdit: String? = message.ref.content
+    override val lastEdit: String?
+        get() = _lastEdit
+
+    private var _queued: MessageQueueStatus = MessageQueueStatus.Empty
+    override val queued: MessageQueueStatus
+        get() = _queued
+
+    override val isActive: Boolean
+        get() = messageEditScope.isActive
+
+    override fun changeTo(content: String?, overrideTransformer: StringTransformer?) {
+        val (newContent, queue) = transformString(content, overrideTransformer)
+        editMessageThrottled(newContent)
+        _queued = queue
+    }
+
+    override suspend fun cancel(content: String?, overrideTransformer: StringTransformer?) {
+        messageEditScope.cancel("cancel was called")
+        val (newContent, queue) = transformString(content, overrideTransformer)
+        _queued = queue
+        editMessage(newContent)
+    }
+
+    override fun cancel() {
+        messageEditScope.cancel("cancel was called")
+    }
+
+    private fun transformString(
+        content: String?,
+        overrideTransformer: StringTransformer?,
+    ): Pair<String?, MessageQueueStatus.Value> {
+        val transformer = overrideTransformer ?: defaultTransformer
+        val newContent = content?.let { transformer(it) }
+        return newContent to MessageQueueStatus.Value(content, transformer)
     }
 }

@@ -27,7 +27,7 @@ object CobaltResponseFactory {
                 }
             }
             is StreamResponse -> uploadStream(eventContext as UploadContext<StreamResponse>)
-            else -> eventContext.botMessageStatus.status == "${eventContext.cobaltResponse} is not supported"
+            else -> eventContext.botMessageStatus.changeTo("${eventContext.cobaltResponse} is not supported")
         }
     }
 

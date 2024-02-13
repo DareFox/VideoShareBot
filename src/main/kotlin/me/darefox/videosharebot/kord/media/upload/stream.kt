@@ -11,7 +11,6 @@ import io.ktor.utils.io.errors.*
 import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.*
 import me.darefox.cobaltik.wrapper.StreamResponse
-import me.darefox.videosharebot.extensions.asInlineCode
 import me.darefox.videosharebot.extensions.filename
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.http.requestFile
@@ -28,7 +27,7 @@ suspend fun uploadStream(eventContext: UploadContext<StreamResponse>) = withCont
     val botMessage = eventContext.botMessage
     val botMessageStatus = eventContext.botMessageStatus
 
-    botMessageStatus.status = asInlineCode("Starting downloading media...")
+    botMessageStatus.changeTo("Starting downloading media...")
 
     lateinit var filename: String
     val maxSizeIncluding = botMessage.ref.getGuild().maxByteFileSize
@@ -46,20 +45,20 @@ suspend fun uploadStream(eventContext: UploadContext<StreamResponse>) = withCont
 
     when (buffered) {
         is Failure -> {
-            botMessageStatus.status = asInlineCode(buffered.reason.message.toString())
+            botMessageStatus.changeTo(buffered.reason.message.toString())
         }
         is Success -> {
             if (buffered.value.size >= maxSizeIncluding) {
-                botMessageStatus.status = asInlineCode("File is too big!")
+                botMessageStatus.changeTo("File is too big!")
                 return@withContext
             }
-
+            botMessageStatus.cancel()
             botMessage.ref.edit {
                 addFile(filename, ChannelProvider(buffered.value.size.toLong()) {
                     ByteReadChannel(buffered.value)
                 })
+                content = ""
             }
-            botMessageStatus.status = ""
             userMessage.edit {
                 suppressEmbeds = true
             }
@@ -79,7 +78,7 @@ private suspend fun readUntilMaxSize(
         while (true) {
             val read = ByteSize(count.byteCount)
             val progress = "${read.toString(ByteUnit.Megabyte)} / ${size?.toString(ByteUnit.Megabyte) ?: "???"}"
-            botMessageStatus.status = asInlineCode(progress)
+            botMessageStatus.changeTo(progress)
             delay(50L)
         }
     }
