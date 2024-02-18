@@ -15,7 +15,7 @@ object CobaltResponseFactory {
         eventContext: UploadContext<WrappedCobaltResponse>
     ) {
         when (eventContext.cobaltResponse) {
-            is PickerResponse -> uploadPicker(eventContext as UploadContext<PickerResponse>)
+            is PickerResponse -> PickerUploader.upload(eventContext as UploadContext<PickerResponse>)
             is RedirectResponse -> {
                 val context = eventContext as UploadContext<RedirectResponse>
                 if (parsedResult.parser in alwaysStream) {
@@ -23,10 +23,10 @@ object CobaltResponseFactory {
                     val newContext = eventContext.copy(cobaltResponse = asStream)
                     this.uploadMedia(parsedResult, newContext)
                 } else {
-                    uploadRedirect(context)
+                    RedirectUploader.upload(context)
                 }
             }
-            is StreamResponse -> uploadStream(eventContext as UploadContext<StreamResponse>)
+            is StreamResponse -> StreamUploader.upload(eventContext as UploadContext<StreamResponse>)
             else -> eventContext.botMessageStatus.changeTo("${eventContext.cobaltResponse} is not supported")
         }
     }
