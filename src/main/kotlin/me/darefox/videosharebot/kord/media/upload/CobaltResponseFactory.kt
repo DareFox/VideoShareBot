@@ -1,10 +1,7 @@
 package me.darefox.videosharebot.kord.media.upload
 
 import dev.forkhandles.result4k.peekFailure
-import me.darefox.cobaltik.wrapper.PickerResponse
-import me.darefox.cobaltik.wrapper.RedirectResponse
-import me.darefox.cobaltik.wrapper.StreamResponse
-import me.darefox.cobaltik.wrapper.WrappedCobaltResponse
+import me.darefox.cobaltik.wrapper.*
 import me.darefox.videosharebot.extensions.ResultMonad
 import me.darefox.videosharebot.match.CompositeMatcherResult
 import me.darefox.videosharebot.match.services.InstagramMatcher
@@ -17,7 +14,7 @@ object CobaltResponseFactory {
         parsedResult: CompositeMatcherResult,
         eventContext: UploadContext<WrappedCobaltResponse>
     ) {
-        var result: ResultMonad<Unit, UploadError>? =  when (eventContext.cobaltResponse) {
+        val result: ResultMonad<Unit, UploadError> =  when (eventContext.cobaltResponse) {
             is PickerResponse -> PickerUploader.upload(eventContext as UploadContext<PickerResponse>)
             is RedirectResponse -> {
                 val context = eventContext as UploadContext<RedirectResponse>
@@ -30,14 +27,18 @@ object CobaltResponseFactory {
                 }
             }
             is StreamResponse -> StreamUploader.upload(eventContext as UploadContext<StreamResponse>)
+            is ErrorResponse -> {
+                eventContext.botMessageStatus.cancel("Cobalt error: ${eventContext.cobaltResponse.text}")
+                return
+            }
             else -> {
-                eventContext.botMessageStatus.changeTo("${eventContext.cobaltResponse} is not supported")
-                null
+                eventContext.botMessageStatus.cancel("${eventContext.cobaltResponse} is not supported")
+                return
             }
 
         }
 
-        result?.peekFailure {
+        result.peekFailure {
             eventContext.botMessageStatus.cancel(
                 content = it.asDiscordMessageText,
                 overrideTransformer = DoNothingWithString
