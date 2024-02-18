@@ -7,6 +7,9 @@ import dev.forkhandles.result4k.Success
 /** Type alias for [Result] to simplify importing it (Kotlin, Ktor and Result4k provide same class name for this monad) */
 typealias ResultMonad<T,E> = Result<T,E>
 
+/** Return empty [Success] **/
+fun Success() = Success(Unit)
+
 /**
  * Executes the provided [block] and wraps the result in a [ResultMonad].
  *
