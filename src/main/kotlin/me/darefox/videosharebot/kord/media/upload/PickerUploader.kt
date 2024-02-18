@@ -26,8 +26,8 @@ import kotlin.math.min
 private typealias ChunkData = Pair<ByteArray, String>
 private typealias ChunkErrorIndexed = Pair<Int, String>
 
-data object PickerUploader: Uploader<PickerResponse>() {
-    override suspend fun upload(context: UploadContext<PickerResponse>): ResultMonad<Unit, String> {
+data object PickerUploader: Uploader<PickerResponse, PickerError>() {
+    override suspend fun upload(context: UploadContext<PickerResponse>): ResultMonad<Unit, PickerError> {
         val response: PickerResponse = context.cobaltResponse
         val userMessage: Message = context.userMessage
         val botMessage: BotMessage = context.botMessage
@@ -35,7 +35,7 @@ data object PickerUploader: Uploader<PickerResponse>() {
 
 
         if (response.type == PickerType.VARIOUS) {
-            return Failure("${response.type} is not supported")
+            return Failure(PickerTypeNotSupported(response.type))
         }
 
         var replyTo: BotMessage? = null
@@ -101,27 +101,12 @@ data object PickerUploader: Uploader<PickerResponse>() {
 
         sendChunk(currentChunk)
         if (errorList.isNotEmpty()) {
-            val errMessage = "Failed to download ${errorList.size} images out of ${response.items.size}"
-            val header = "\n\n"
-            val listString = StringBuilder()
-
-            listString.append("Reasons:\n")
-            for ((index, reason) in errorList) {
-                listString.append("Image #${index+1}: $reason\n")
-            }
-            val maxCharacters = 250
-            val reasons = listString.toString()
-            var stripped = (reasons).substring(0, min(maxCharacters, reasons.length))
-
-            if (stripped.length < reasons.length) {
-                stripped += "..."
-            }
-
-            botMessageStatus.changeTo(header + stripped, MarkdownCodeBlock())
-            return Failure(errMessage)
+            return Failure(FailedToDownloadImages(errorList, response.items.size))
         } else {
-            userMessage.edit { suppressEmbeds = true }
-            botMessageStatus.changeTo(null)
+            userMessage.edit {
+                suppressEmbeds = true
+            }
+            botMessageStatus.cancel(null)
         }
 
         return Success(Unit)
