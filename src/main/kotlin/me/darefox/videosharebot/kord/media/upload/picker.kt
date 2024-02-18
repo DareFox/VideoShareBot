@@ -16,7 +16,7 @@ import me.darefox.videosharebot.extensions.filename
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.http.requestFile
 import me.darefox.videosharebot.kord.extensions.BotMessage
-import me.darefox.videosharebot.kord.extensions.BotMessageStatus
+import me.darefox.videosharebot.kord.tools.BotMessageStatus
 import me.darefox.videosharebot.kord.extensions.asBotMessage
 import me.darefox.videosharebot.kord.extensions.maxByteFileSizeOrMin
 import me.darefox.videosharebot.tools.stringtransformers.MarkdownCodeBlock

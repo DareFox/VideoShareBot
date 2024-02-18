@@ -1,9 +1,11 @@
-package me.darefox.videosharebot.kord.extensions
+package me.darefox.videosharebot.kord.tools
 
 import dev.kord.core.behavior.edit
 import kotlinx.coroutines.*
 import me.darefox.videosharebot.extensions.createChildScope
 import me.darefox.videosharebot.extensions.onCancel
+import me.darefox.videosharebot.kord.extensions.BotMessage
+import me.darefox.videosharebot.kord.extensions.isMe
 import me.darefox.videosharebot.tools.ArgumentsMode
 import me.darefox.videosharebot.tools.DelayMode
 import me.darefox.videosharebot.tools.stringtransformers.StringTransformer

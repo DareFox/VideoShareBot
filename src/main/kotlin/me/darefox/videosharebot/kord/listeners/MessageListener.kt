@@ -11,7 +11,7 @@ import kotlinx.coroutines.*
 import me.darefox.cobaltik.wrapper.Cobalt
 import me.darefox.cobaltik.wrapper.WrappedCobaltResponse
 import me.darefox.videosharebot.extensions.tryAsResult
-import me.darefox.videosharebot.kord.extensions.BotMessageStatus
+import me.darefox.videosharebot.kord.tools.BotMessageStatus
 import me.darefox.videosharebot.kord.extensions.asBotMessage
 import me.darefox.videosharebot.kord.extensions.changeToExceptionError
 import me.darefox.videosharebot.kord.media.upload.CobaltResponseFactory
