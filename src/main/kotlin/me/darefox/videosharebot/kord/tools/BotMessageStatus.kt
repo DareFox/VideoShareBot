@@ -20,6 +20,7 @@ class BotMessageStatus(
 ) : IBotMessageStatus {
     private val log = KotlinLogging.logger { }
     private val messageEditScope = scope.createChildScope(false, Dispatchers.IO)
+    private val delayDuration = 2.seconds
 
     private var _lastEdit: String? = message.ref.content
     override val lastEdit: String?
@@ -39,8 +40,9 @@ class BotMessageStatus(
             content = newContent
         }
     }
+
     private val editMessageThrottled = messageEditScope.throttleFuncArg<String?>(
-        delayDuration = 1.seconds,
+        delayDuration = delayDuration,
         delayMode = DelayMode.DELAY_MINUS_PROCESS_TIME,
         argumentsMode = ArgumentsMode.ONLY_UNIQUE_ARGUMENTS
     ) { newContent ->
