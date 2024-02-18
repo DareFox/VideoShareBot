@@ -18,15 +18,20 @@ class BotMessageStatus(
     private val scope: CoroutineScope,
     override var defaultTransformer: StringTransformer,
 ) : IBotMessageStatus {
-    init {
-        val author = requireNotNull(message.ref.author) { "Author is null" }
-        require(author.isMe()) {
-            "Message is not made by me, but ${author.username}"
-        }
-    }
-
     private val log = KotlinLogging.logger { }
     private val messageEditScope = scope.createChildScope(false, Dispatchers.IO)
+
+    private var _lastEdit: String? = message.ref.content
+    override val lastEdit: String?
+        get() = _lastEdit
+
+    private var _queued: MessageQueueStatus = MessageQueueStatus.Empty
+    override val queued: MessageQueueStatus
+        get() = _queued
+
+    override val isActive: Boolean
+        get() = messageEditScope.isActive
+
 
     private suspend fun editMessage(newContent: String?) {
         _lastEdit = newContent
@@ -59,17 +64,6 @@ class BotMessageStatus(
             }
         }
     }
-
-    private var _lastEdit: String? = message.ref.content
-    override val lastEdit: String?
-        get() = _lastEdit
-
-    private var _queued: MessageQueueStatus = MessageQueueStatus.Empty
-    override val queued: MessageQueueStatus
-        get() = _queued
-
-    override val isActive: Boolean
-        get() = messageEditScope.isActive
 
     override fun changeTo(content: String?, overrideTransformer: StringTransformer?) {
         val (newContent, queue) = transformString(content, overrideTransformer)
