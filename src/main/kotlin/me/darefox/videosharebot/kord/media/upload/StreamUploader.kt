@@ -11,6 +11,8 @@ import io.ktor.utils.io.errors.*
 import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.*
 import me.darefox.cobaltik.wrapper.StreamResponse
+import me.darefox.videosharebot.extensions.ResultMonad
+import me.darefox.videosharebot.extensions.Success
 import me.darefox.videosharebot.extensions.filename
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.http.requestFile
@@ -21,7 +23,7 @@ import me.darefox.videosharebot.tools.ByteUnit
 import me.darefox.videosharebot.tools.toString
 import org.apache.commons.io.input.CountingInputStream
 
-data object StreamUploader : Uploader<StreamResponse>() {
+data object StreamUploader : Uploader<StreamResponse, StreamError>() {
     override suspend fun upload(context: UploadContext<StreamResponse>) = withContext(Dispatchers.IO) {
         val response = context.cobaltResponse
         val userMessage = context.userMessage
@@ -32,37 +34,40 @@ data object StreamUploader : Uploader<StreamResponse>() {
 
         lateinit var filename: String
         val maxSizeIncluding = botMessage.ref.getGuild().maxByteFileSize
-        val buffered = tryAsResult<ByteArray, IOException> {
+        val buffered = tryAsResult<ResultMonad<ByteArray, StreamError>, IOException> {
             requestFile(response.streamUrl) { http ->
                 val expectedSize = http.contentLength() ?: 0
                 if (expectedSize >= maxSizeIncluding) {
-                    throw IOException("File is too big!")
+                    return@requestFile Failure(FileIsTooBig)
                 }
 
                 filename = http.filename() ?: throw IllegalArgumentException("Can't calculate filename by http response")
-                readUntilMaxSize(http, botMessageStatus, maxSizeIncluding)
+                Success(readUntilMaxSize(http, botMessageStatus, maxSizeIncluding))
             }
         }
 
-        when (buffered) {
-            is Failure -> {
-                return@withContext Failure(buffered.reason.message.toString())
-            }
+        val result = when (buffered) {
+            is Failure -> return@withContext Failure(IOError(buffered.reason))
+            is Success -> buffered.value
+        }
+
+        when (result) {
+            is Failure -> return@withContext Failure(result.reason)
             is Success -> {
-                if (buffered.value.size >= maxSizeIncluding) {
-                    return@withContext Failure("File is too big!")
+                if (result.value.size >= maxSizeIncluding) {
+                    return@withContext Failure(FileIsTooBig)
                 }
                 botMessageStatus.cancel()
                 botMessage.ref.edit {
-                    addFile(filename, ChannelProvider(buffered.value.size.toLong()) {
-                        ByteReadChannel(buffered.value)
+                    addFile(filename, ChannelProvider(result.value.size.toLong()) {
+                        ByteReadChannel(result.value)
                     })
                     content = ""
                 }
                 userMessage.edit {
                     suppressEmbeds = true
                 }
-                return@withContext Success(Unit)
+                return@withContext Success()
             }
         }
     }
