@@ -1,4 +1,4 @@
-package me.darefox.videosharebot.kord.extensions
+package me.darefox.videosharebot.kord.tools
 
 import me.darefox.videosharebot.tools.stringtransformers.StringTransformer
 
@@ -10,10 +10,12 @@ interface IBotMessageStatus {
      * The last edited content of the message.
      */
     val lastEdit: String?
+
     /**
      * The current status of the message queue. If queued content was emitted, queue will still remain same
      */
     val queued: MessageQueueStatus
+
     /**
      * Indicates whether the status updates are active.
      */

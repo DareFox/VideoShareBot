@@ -14,7 +14,7 @@ import me.darefox.cobaltik.wrapper.StreamResponse
 import me.darefox.videosharebot.extensions.filename
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.http.requestFile
-import me.darefox.videosharebot.kord.extensions.BotMessageStatus
+import me.darefox.videosharebot.kord.tools.BotMessageStatus
 import me.darefox.videosharebot.kord.extensions.maxByteFileSize
 import me.darefox.videosharebot.tools.ByteSize
 import me.darefox.videosharebot.tools.ByteUnit
