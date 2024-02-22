@@ -11,7 +11,6 @@ data class ByteSize(
 ) {
     override fun toString(): String = "$bytes B"
 }
-
 enum class ByteUnit(val conversionRateInBytes: Long, val suffix: String) {
     Kilobyte(DECIMAL_BASE.toLong(), "kB"),
     Megabyte(pow(DECIMAL_BASE, 2), "MB"),
@@ -38,3 +37,8 @@ fun ByteSize.toString(
     val result = decimalFormat.format(bytes.toDouble() / unit.conversionRateInBytes).replace(',', '.')
     return "$result ${unit.suffix}"
 }
+
+fun Int.toKilobyte() = ByteSize(ByteUnit.Kilobyte.conversionRateInBytes * this)
+fun Int.toMegabyte() = ByteSize(ByteUnit.Megabyte.conversionRateInBytes * this)
+fun Int.toGigabyte() = ByteSize(ByteUnit.Gigabyte.conversionRateInBytes * this)
+fun Int.toTerabyte() = ByteSize(ByteUnit.Terabyte.conversionRateInBytes * this)
