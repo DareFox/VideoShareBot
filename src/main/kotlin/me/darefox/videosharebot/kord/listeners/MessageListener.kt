@@ -10,6 +10,7 @@ import dev.kord.core.event.message.MessageCreateEvent
 import kotlinx.coroutines.*
 import me.darefox.cobaltik.wrapper.Cobalt
 import me.darefox.cobaltik.wrapper.WrappedCobaltResponse
+import me.darefox.videosharebot.extensions.createLogger
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.kord.tools.BotMessageStatus
 import me.darefox.videosharebot.kord.extensions.asBotMessage
@@ -23,7 +24,7 @@ import mu.KotlinLogging
 
 class MessageListener : Extension() {
     override val name: String = this::class.simpleName!!
-    private val log = KotlinLogging.logger { }
+    private val log = createLogger()
 
     val compositeParser = CompositeMatcher(
         setOf(
