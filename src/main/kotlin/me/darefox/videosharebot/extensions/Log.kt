@@ -1,5 +1,6 @@
 package me.darefox.videosharebot.extensions
 
+import kotlinx.coroutines.CancellationException
 import mu.KLogger
 import mu.KotlinLogging
 
@@ -15,4 +16,6 @@ fun Any.createLogger(): KLogger {
     return KotlinLogging.logger("$slicedName@${hashCodeHex()}")
 }
 
+fun KLogger.logCancel(cancellation: CancellationException) {
+    debug { "Cancelled by $cancellation" }
 }

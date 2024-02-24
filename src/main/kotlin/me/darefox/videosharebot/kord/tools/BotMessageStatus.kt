@@ -2,16 +2,12 @@ package me.darefox.videosharebot.kord.tools
 
 import dev.kord.core.behavior.edit
 import kotlinx.coroutines.*
-import me.darefox.videosharebot.extensions.createChildScope
-import me.darefox.videosharebot.extensions.createLogger
-import me.darefox.videosharebot.extensions.onCancel
+import me.darefox.videosharebot.extensions.*
 import me.darefox.videosharebot.kord.extensions.BotMessage
-import me.darefox.videosharebot.kord.extensions.isMe
 import me.darefox.videosharebot.tools.ArgumentsMode
 import me.darefox.videosharebot.tools.DelayMode
 import me.darefox.videosharebot.tools.stringtransformers.StringTransformer
 import me.darefox.videosharebot.tools.throttleFuncArg
-import mu.KotlinLogging
 import kotlin.time.Duration.Companion.seconds
 
 class BotMessageStatus(
@@ -52,7 +48,7 @@ class BotMessageStatus(
 
     @OptIn(DelicateCoroutinesApi::class)
     private val onCancel = scope.onCancel(CoroutineName("BotMessageStatus-OnCancel")) {
-        log.debug { "BotMessageStatus was cancelled because ${it.message} (throwable: ${it.cause})" }
+        log.logCancel(it)
 
         if (!isActive) return@onCancel
         messageEditScope.cancel(it)
