@@ -1,5 +1,7 @@
 package me.darefox.videosharebot.ffmpeg
 
+import java.io.File
+
 @DslMarker
 annotation class FFmpegBuilderMarker
 
@@ -43,3 +45,17 @@ fun createFFmpeg(
     outputFile: String,
     builderFunc: FFmpegBuilder.() -> Unit
 ) = FFmpegBuilder(ffmpegPath, inputFile, outputFile).apply(builderFunc).build()
+
+fun createFFmpeg(
+    ffmpegPath: String,
+    inputFile: File,
+    outputFile: File,
+    builderFunc: FFmpegBuilder.() -> Unit
+) = createFFmpeg(ffmpegPath, inputFile.absolutePath, outputFile.absolutePath, builderFunc)
+
+fun createFFmpeg(
+    ffmpegPath: File,
+    inputFile: File,
+    outputFile: File,
+    builderFunc: FFmpegBuilder.() -> Unit
+) = createFFmpeg(ffmpegPath.absolutePath, inputFile, outputFile, builderFunc)
