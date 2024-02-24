@@ -11,12 +11,13 @@ fun CoroutineScope.createChildScope(useSupervisor: Boolean, context: CoroutineCo
     }
     return (context?.let { CoroutineScope(it) } ?: this) + job
 }
-
-fun CoroutineScope.onCancel(context: CoroutineContext? = null, func: (CancellationException) -> Unit) = launch(context ?: EmptyCoroutineContext) {
-    try {
-        awaitCancellation()
-    } catch (ex: CancellationException) {
-        func(ex)
-        throw ex
+fun CoroutineScope.onCancel(context: CoroutineContext? = null, func: (CancellationException) -> Unit): Job {
+    return launch(CoroutineName("onCancel") + (context ?: EmptyCoroutineContext)) {
+        try {
+            awaitCancellation()
+        } catch (ex: CancellationException) {
+            func(ex)
+            throw ex
+        }
     }
 }
