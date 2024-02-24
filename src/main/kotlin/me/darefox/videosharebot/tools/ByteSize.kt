@@ -38,6 +38,7 @@ fun ByteSize.toString(
     return "$result ${unit.suffix}"
 }
 
+fun Long.toByteSize() = ByteSize(this)
 fun Int.toKilobyte() = ByteSize(ByteUnit.Kilobyte.conversionRateInBytes * this)
 fun Int.toMegabyte() = ByteSize(ByteUnit.Megabyte.conversionRateInBytes * this)
 fun Int.toGigabyte() = ByteSize(ByteUnit.Gigabyte.conversionRateInBytes * this)
