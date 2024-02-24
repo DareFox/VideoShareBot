@@ -12,5 +12,7 @@ fun Any.createLogger(): KLogger {
             name.contains("$") -> name.substringBefore("$")
             else -> name
         }
-    return KotlinLogging.logger("$slicedName@${hashCode().toHexString()}")
+    return KotlinLogging.logger("$slicedName@${hashCodeHex()}")
+}
+
 }
