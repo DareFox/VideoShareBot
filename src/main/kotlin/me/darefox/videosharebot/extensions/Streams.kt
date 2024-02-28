@@ -36,4 +36,5 @@ suspend fun InputStream.writeTo(outputStream: OutputStream, bufferSize: Int = 10
         yield()
         outputStream.write(buffer, 0, read)
     }
+    outputStream.close()
 }
