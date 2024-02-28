@@ -5,15 +5,15 @@ import me.darefox.videosharebot.tools.ByteSize
 fun FFmpegBuilderStep.GlobalOptions.hideBanner() = +"-hide_banner"
 
 sealed class FFmpegLogLevel(flag: String, code: Int) : FFmpegOptionValue(flag, code) {
-    data object Quiet: FFmpegLogLevel("quiet", -8)
-    data object Panic: FFmpegLogLevel("panic", 0)
-    data object Fatal: FFmpegLogLevel("fatal", 8)
-    data object Error: FFmpegLogLevel("error", 16)
-    data object Warning: FFmpegLogLevel("warning", 24)
-    data object Info: FFmpegLogLevel("info", 32)
-    data object Verbose: FFmpegLogLevel("verbose", 40)
-    data object Debug: FFmpegLogLevel("debug", 48)
-    data object Trace: FFmpegLogLevel("trace", 56)
+    data object Quiet : FFmpegLogLevel("quiet", -8)
+    data object Panic : FFmpegLogLevel("panic", 0)
+    data object Fatal : FFmpegLogLevel("fatal", 8)
+    data object Error : FFmpegLogLevel("error", 16)
+    data object Warning : FFmpegLogLevel("warning", 24)
+    data object Info : FFmpegLogLevel("info", 32)
+    data object Verbose : FFmpegLogLevel("verbose", 40)
+    data object Debug : FFmpegLogLevel("debug", 48)
+    data object Trace : FFmpegLogLevel("trace", 56)
 }
 
 fun FFmpegBuilderStep.GlobalOptions.logLevel(vararg level: FFmpegLogLevel) {
@@ -21,6 +21,7 @@ fun FFmpegBuilderStep.GlobalOptions.logLevel(vararg level: FFmpegLogLevel) {
         it.flag.lowercase()
     })
 }
+
 fun FFmpegBuilderStep.GlobalOptions.overwriteFiles() = addSplitOption("-y")
 fun FFmpegBuilderStep.GlobalOptions.doNotOverwriteFiles() = addSplitOption("-n")
 
@@ -33,3 +34,10 @@ fun FFmpegBuilderStep.EncodeOptions.bitrate(stream: StreamSpecifier, bitrate: By
     addSplitOption("-b:$stream", "${bitrate.bytes}")
 
 fun FFmpegBuilderStep.EncodeOptions.codec(stream: StreamSpecifier, codec: String) = addSplitOption("-c:$stream", codec)
+
+/**
+ * Downscale biggest dimension out of two with saving aspect ratio
+ */
+fun FFmpegBuilderStep.EncodeOptions.downscaleByBiggestDimension(downscaleTo: Int) {
+    addSplitOption("-vf", "scale=w=$downscaleTo:h=$downscaleTo:force_original_aspect_ratio=decrease")
+}

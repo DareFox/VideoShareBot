@@ -53,20 +53,20 @@ class FFmpeg(
 
         when {
             code != 0 -> {
-                setStatusToError()
+                setStatusToError(code, errorList)
                 Failure(FFmpegError(errorList, code))
             }
             else -> Success()
         }
     }
 
-    private fun setStatusToError() {
+    private fun setStatusToError(code: Int, errorLines: List<String>) {
         _status.updateAndGet {
             when (it) {
-                is FFmpegStatus.Continue -> FFmpegStatus.Error(it.progress)
+                is FFmpegStatus.Continue -> FFmpegStatus.Error(code, errorLines, it.progress)
                 is FFmpegStatus.End -> throw IllegalStateException("You shouldn't get here")
                 is FFmpegStatus.Error -> it
-                FFmpegStatus.NotStarted -> FFmpegStatus.Error(null)
+                FFmpegStatus.NotStarted -> FFmpegStatus.Error(code, errorLines, null)
             }
         }
     }
