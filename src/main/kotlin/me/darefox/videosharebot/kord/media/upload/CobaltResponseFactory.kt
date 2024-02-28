@@ -35,7 +35,6 @@ object CobaltResponseFactory {
                 eventContext.botMessageStatus.cancel("${eventContext.cobaltResponse} is not supported")
                 return
             }
-
         }
 
         result.peekFailure {

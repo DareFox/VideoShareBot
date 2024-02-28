@@ -18,6 +18,9 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
 
+    // Kotlinx IO
+    implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.3.1")
+
     // Logger
     implementation("org.slf4j:slf4j-api:2.0.11")
     implementation("ch.qos.logback:logback-classic:1.4.14")
