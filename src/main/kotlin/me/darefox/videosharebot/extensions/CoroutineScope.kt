@@ -12,7 +12,8 @@ fun CoroutineScope.createChildScope(useSupervisor: Boolean, context: CoroutineCo
     return (context?.let { CoroutineScope(it) } ?: this) + job
 }
 fun CoroutineScope.onCancel(context: CoroutineContext? = null, func: (CancellationException) -> Unit): Job {
-    return launch(CoroutineName("onCancel") + (context ?: EmptyCoroutineContext)) {
+    val coroutineName = coroutineContext[CoroutineName]?.name ?: "coroutine"
+    return launch(CoroutineName("$coroutineName-<onCancel>") + (context ?: EmptyCoroutineContext)) {
         try {
             awaitCancellation()
         } catch (ex: CancellationException) {
