@@ -20,8 +20,6 @@ import me.darefox.videosharebot.kord.extensions.BotMessage
 import me.darefox.videosharebot.kord.tools.BotMessageStatus
 import me.darefox.videosharebot.kord.extensions.asBotMessage
 import me.darefox.videosharebot.kord.extensions.maxByteFileSizeOrMin
-import me.darefox.videosharebot.tools.stringtransformers.MarkdownCodeBlock
-import kotlin.math.min
 
 private typealias ChunkData = Pair<ByteArray, String>
 private typealias ChunkErrorIndexed = Pair<Int, String>
@@ -32,7 +30,6 @@ data object PickerUploader: Uploader<PickerResponse, PickerError>() {
         val userMessage: Message = context.userMessage
         val botMessage: BotMessage = context.botMessage
         val botMessageStatus: BotMessageStatus = context.botMessageStatus
-
 
         if (response.type == PickerType.VARIOUS) {
             return Failure(PickerTypeNotSupported(response.type))
@@ -88,7 +85,7 @@ data object PickerUploader: Uploader<PickerResponse, PickerError>() {
             lateinit var filename: String
             val result = tryAsResult<ByteArray, IOException> {
                 requestFile(image.url) {
-                    filename = it.filename() ?: throw IOException("Can't calculate filename from http response")
+                    filename = it.filename()?.prefix ?: throw IOException("Can't calculate filename from http response")
                     it.bodyAsChannel().toByteArray()
                 }
             }

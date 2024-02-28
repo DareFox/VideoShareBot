@@ -20,8 +20,6 @@ import me.darefox.videosharebot.kord.media.upload.UploadContext
 import me.darefox.videosharebot.match.CompositeMatcher
 import me.darefox.videosharebot.match.services.*
 import me.darefox.videosharebot.tools.stringtransformers.MarkdownCodeInline
-import mu.KotlinLogging
-
 class MessageListener : Extension() {
     override val name: String = this::class.simpleName!!
     private val log = createLogger()
