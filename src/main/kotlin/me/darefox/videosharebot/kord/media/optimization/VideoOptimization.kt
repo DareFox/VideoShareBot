@@ -5,9 +5,7 @@ import dev.forkhandles.result4k.Success
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import me.darefox.videosharebot.extensions.ResultMonad
-import me.darefox.videosharebot.extensions.createLogger
-import me.darefox.videosharebot.extensions.writeTo
+import me.darefox.videosharebot.extensions.*
 import me.darefox.videosharebot.ffmpeg.*
 import me.darefox.videosharebot.ffmpeg.encoders.Libopus
 import me.darefox.videosharebot.ffmpeg.encoders.NvencH264
@@ -16,6 +14,9 @@ import me.darefox.videosharebot.ffmpeg.encoders.nvencH264
 import me.darefox.videosharebot.tools.*
 import java.io.File
 import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.OpenOption
+import java.nio.file.StandardOpenOption
 
 class VideoOptimization: Optimizer {
     private val log = createLogger()
@@ -27,46 +28,57 @@ class VideoOptimization: Optimizer {
         outputSizeLimit: ByteSize,
         extension: FileExtension
     ): ResultMonad<InputStream, OptimizationError> = withContext(Dispatchers.IO) {
-        log.info { "Optimization: creating temp input file" }
+        log.info { "Creating temp input file" }
         val tempInput = File.createTempFile("videoFFmpegInput", extension.extension)
-        log.info { "Optimization: writing to temp input file" }
-        input.writeTo(tempInput.outputStream())
-
-        log.info { "Optimization: creating temp output file" }
+        log.info { "Writing to temp input file" }
+        val stream = tempInput.outputStream()
+        input.writeTo(stream)
+        log.info { "Creating temp output file" }
         val tempOutput = File.createTempFile("videoFFmpegOutput", extension.extension)
 
-
         var listenerFailure: Failure<OptimizationError>? = null
-        var listener: Job? = null
 
         val ffmpeg = buildFFmpeg(tempInput, tempOutput)
         val ffmpegJob = async(CoroutineName("VideoOptimization-FFMPEG")) {
-            log.info { "Optimization: starting ffmpeg" }
-            ffmpeg.process().also {
-                log.info { "Optimization: cancelling listener" }
-                listener?.cancel()
-            }
+            log.info { "Starting ffmpeg" }
+            ffmpeg.process()
         }
 
-        listener = launch(CoroutineName("VideoOptimization-StatusCollector")) {
+        val listener = launch(CoroutineName("VideoOptimization-StatusCollector")) {
             ffmpeg.status.collect { progress ->
                 if (isBiggerThanLimit(progress, outputSizeLimit)) {
                     listenerFailure = Failure(FileIsTooBigAfterOptimization)
                     ffmpegJob.cancel()
                 }
-
                 _state.value = progress.convertToOptimizationStatus()
             }
         }
 
+        var isEnd = false
+        val cancellationJob = onCancel {
+            log.info { "Cancelling listener" }
+            listener.cancel()
+            log.info { "Deleting temp input file ${tempInput.name} result: " + tempInput.delete() }
+            if (!isEnd) {
+                log.info { "Optimization was cancelled before ffmpeg finished, deleting temp output" }
+                tempOutput.delete()
+            } else {
+                log.info { "Optimization was cancelled after ffmpeg, returning" }
+            }
+        }
 
         try {
             when(val result = ffmpegJob.await()) {
                 is Failure -> Failure(result.reason.convertToOptimizationError());
-                is Success -> Success(tempOutput.inputStream())
+                is Success -> Success(Files.newInputStream(tempOutput.toPath(), StandardOpenOption.DELETE_ON_CLOSE))
+            }.also {
+                isEnd = true
+                cancellationJob.cancel()
             }
         } catch (ex: CancellationException) {
             return@withContext listenerFailure ?: throw ex
+        }finally {
+            println("test")
         }
     }
 
