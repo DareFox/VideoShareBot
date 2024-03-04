@@ -10,14 +10,20 @@ object TikTokMatcher: UrlMatcher() {
     override val pattern: UrlPattern = UrlPattern(
         baseDomains = listOf("tiktok.com"),
         subdomains = listOf("www", "vm", ""),
-        segmentMatchers = listOf(
-            listOf(
-               Anything,
-               SpecificText("video"),
-                NumberLength(numberOfDigits = 19)
+        segmentPatterns = listOf(
+            UrlSegmentPattern(
+                queryMatcher = listOf(),
+                segmentMatchers = listOf(
+                    Anything,
+                    SpecificText("video"),
+                    NumberLength(numberOfDigits = 19)
+                )
             ),
-            listOf(
-                TextLength(length = 9)
+            UrlSegmentPattern(
+                queryMatcher = listOf(),
+                segmentMatchers = listOf(
+                    TextLength(length = 9)
+                )
             )
         )
     )

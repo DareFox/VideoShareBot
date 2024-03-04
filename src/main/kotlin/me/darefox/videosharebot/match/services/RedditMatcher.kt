@@ -16,9 +16,15 @@ object RedditMatcher: UrlMatcher() {
     override val pattern = UrlPattern(
         baseDomains = listOf("reddit.com"),
         subdomains = listOf("", "www"),
-        segmentMatchers = listOf(
-            withoutId,
-            withoutId + Anything
+        segmentPatterns = listOf(
+            UrlSegmentPattern(
+                queryMatcher = listOf(),
+                segmentMatchers = withoutId
+            ),
+            UrlSegmentPattern(
+                queryMatcher = listOf(),
+                segmentMatchers = withoutId + Anything
+            ),
         )
     )
 }

@@ -3,7 +3,7 @@ package me.darefox.videosharebot.match
 data class UrlPattern(
     val baseDomains: List<String>,
     val subdomains: List<String> = listOf(""),
-    val segmentMatchers: List<List<UrlSegmentMatcher>>
+    val segmentPatterns: List<UrlSegmentPattern>
 ) {
     init {
         baseDomains.forEach {
@@ -15,3 +15,8 @@ data class UrlPattern(
         }
     }
 }
+
+data class UrlSegmentPattern(
+    val queryMatcher: List<UrlQueryMatcher>,
+    val segmentMatchers: List<UrlSegmentMatcher>,
+)

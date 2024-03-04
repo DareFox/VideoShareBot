@@ -33,38 +33,62 @@ abstract class UrlMatcher {
         }.filter {
             it.protocol in supportedProtocols
         }.mapNotNull {
-            applyPattern(pattern, it)
+            if (applyPattern(pattern, it)) {
+                it.toString()
+            } else {
+                null
+            }
         }.toList()
     }
 
-    private fun applyPattern(pattern: UrlPattern, url: URL): String? {
+    private fun applyPattern(pattern: UrlPattern, url: URL): Boolean {
         val domain = pattern.baseDomains.firstOrNull { baseDomain ->
             url.host.endsWith(baseDomain)
-        } ?: return null
+        } ?: return false
 
         val subdomain = url.host.removeSuffix(domain).removeSuffix(".")
-        if (subdomain !in pattern.subdomains) return null
+        if (subdomain !in pattern.subdomains) return false
 
-        return applySegmentMatchers(pattern.segmentMatchers, url)?.toString()
+        return pattern.segmentPatterns.any {
+            if (!isQueryMatch(it.queryMatcher, url)) return@any false
+            isSegmentMatch(it.segmentMatchers, url)
+        }
     }
 
-    private fun applySegmentMatchers(matchers: List<List<UrlSegmentMatcher>>, url: URL): URL? {
+    private fun isSegmentMatch(segmentMatchers: List<UrlSegmentMatcher>, url: URL): Boolean {
         val path = url.path.removeSuffix("/").removePrefix("/").split("/")
-        val usefulMatchers = matchers.filter {
-            it.size == path.size
-        }
+        if (segmentMatchers.size != path.size) return false
 
-        for (pattern in usefulMatchers) {
-            var valid = true
-            for ((index, segmentMatcher) in pattern.withIndex()) {
-                val text = path[index]
-                valid = segmentMatcher.validate(text)
-                if (!valid) break
+
+        var index = 0
+        return segmentMatchers.all {
+            it.validate(path[index]).also {
+                index++
             }
-            if (valid) return url
+        }
+    }
+
+    private fun isQueryMatch(queryMatcher: List<UrlQueryMatcher>, url: URL): Boolean {
+        val querySplit = url.query?.split("=", "&") ?: return true
+        require(querySplit.size % 2 == 0) {
+            "(${url.query}) can't be split evenly ($querySplit)"
+        }
+        val map = mutableMapOf<String,String>()
+        var key: String? = null
+        for ((index, keyOrValue) in querySplit.withIndex()) {
+            if (index % 2 == 0) { // key
+                key = keyOrValue
+            } else { // value
+                requireNotNull(key)
+                map[key] = keyOrValue
+                key = null
+            }
         }
 
-        return null
+        return queryMatcher.all {
+            val value = map[it.key] ?: return@all false
+            it.validator.validate(value)
+        }
     }
 }
 
