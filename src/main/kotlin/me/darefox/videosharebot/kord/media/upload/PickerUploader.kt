@@ -20,6 +20,7 @@ import me.darefox.videosharebot.kord.extensions.BotMessage
 import me.darefox.videosharebot.kord.tools.BotMessageStatus
 import me.darefox.videosharebot.kord.extensions.asBotMessage
 import me.darefox.videosharebot.kord.extensions.maxByteFileSizeOrMin
+import me.darefox.videosharebot.tools.Filename
 
 private typealias ChunkData = Pair<ByteArray, String>
 private typealias ChunkErrorIndexed = Pair<Int, String>
@@ -33,6 +34,16 @@ data object PickerUploader: Uploader<PickerResponse, PickerError>() {
 
         if (response.type == PickerType.VARIOUS) {
             return Failure(PickerTypeNotSupported(response.type))
+        }
+
+        var isAudioSent = false
+        val audioFile: Pair<Filename, ByteArray>? = response.audioUrl?.let {
+            lateinit var filename: Filename
+            val result = requestFile(it) {
+                filename = it.filename() ?: throw IOException("Can't calculate filename from http response")
+                it.bodyAsChannel().toByteArray()
+            }
+            filename to result
         }
 
         var replyTo: BotMessage? = null
@@ -85,7 +96,7 @@ data object PickerUploader: Uploader<PickerResponse, PickerError>() {
             lateinit var filename: String
             val result = tryAsResult<ByteArray, IOException> {
                 requestFile(image.url) {
-                    filename = it.filename()?.prefix ?: throw IOException("Can't calculate filename from http response")
+                    filename = it.filename()?.fullName ?: throw IOException("Can't calculate filename from http response")
                     it.bodyAsChannel().toByteArray()
                 }
             }
@@ -97,6 +108,12 @@ data object PickerUploader: Uploader<PickerResponse, PickerError>() {
         }
 
         sendChunk(currentChunk)
+        if (audioFile != null) {
+            replyTo?.ref?.reply {
+                addFile(audioFile.first.fullName, ChannelProvider { ByteReadChannel(audioFile.second) })
+            }
+        }
+
         if (errorList.isNotEmpty()) {
             return Failure(FailedToDownloadImages(errorList, response.items.size))
         } else {
