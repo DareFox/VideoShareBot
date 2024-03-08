@@ -12,9 +12,11 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.errors.*
 import me.darefox.cobaltik.models.PickerType
 import me.darefox.cobaltik.wrapper.PickerResponse
+import me.darefox.videosharebot.config.GlobalApplicationConfig
 import me.darefox.videosharebot.extensions.ResultMonad
 import me.darefox.videosharebot.extensions.filename
 import me.darefox.videosharebot.extensions.tryAsResult
+import me.darefox.videosharebot.ffmpeg.FFmpegBuilderStep
 import me.darefox.videosharebot.http.requestFile
 import me.darefox.videosharebot.kord.extensions.BotMessage
 import me.darefox.videosharebot.kord.tools.BotMessageStatus
@@ -37,14 +39,16 @@ data object PickerUploader: Uploader<PickerResponse, PickerError>() {
         }
 
         var isAudioSent = false
-        val audioFile: Pair<Filename, ByteArray>? = response.audioUrl?.let {
-            lateinit var filename: Filename
-            val result = requestFile(it) {
-                filename = it.filename() ?: throw IOException("Can't calculate filename from http response")
-                it.bodyAsChannel().toByteArray()
+        val audioFile: Pair<Filename, ByteArray>? = if (GlobalApplicationConfig.cobalt.sendAudioWithSlideshow) {
+            response.audioUrl?.let { audioUrl ->
+                lateinit var filename: Filename
+                val result = requestFile(audioUrl) { res ->
+                    filename = res.filename() ?: throw IOException("Can't calculate filename from http response")
+                    res.bodyAsChannel().toByteArray()
+                }
+                filename to result
             }
-            filename to result
-        }
+        } else null
 
         var replyTo: BotMessage? = null
         val maxSizeIncluding = botMessage.ref.getGuildOrNull().maxByteFileSizeOrMin()

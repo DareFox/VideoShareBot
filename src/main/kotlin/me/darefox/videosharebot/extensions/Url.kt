@@ -1,5 +1,11 @@
 package me.darefox.videosharebot.extensions
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -28,4 +34,16 @@ fun URL.toSafeFilename(): String {
     return toConvert
         .replace(regex, "_")
         .replace(underscoreRegex, "__")
+}
+
+object URLSerializer: KSerializer<URL> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(this.javaClass.name, PrimitiveKind.STRING)
+
+    override fun deserialize(decoder: Decoder): URL {
+        return URL(decoder.decodeString())
+    }
+
+    override fun serialize(encoder: Encoder, value: URL) {
+        encoder.encodeString(value.toString())
+    }
 }

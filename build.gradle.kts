@@ -43,6 +43,9 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
+    // YAML serializer
+    implementation("com.charleskorn.kaml:kaml:0.57.0")
+
 }
 
 tasks.test {

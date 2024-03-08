@@ -10,6 +10,7 @@ import dev.kord.core.event.message.MessageCreateEvent
 import kotlinx.coroutines.*
 import me.darefox.cobaltik.wrapper.Cobalt
 import me.darefox.cobaltik.wrapper.WrappedCobaltResponse
+import me.darefox.videosharebot.config.*
 import me.darefox.videosharebot.extensions.createLogger
 import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.kord.tools.BotMessageStatus
@@ -18,21 +19,18 @@ import me.darefox.videosharebot.kord.extensions.changeToExceptionError
 import me.darefox.videosharebot.kord.media.upload.CobaltResponseFactory
 import me.darefox.videosharebot.kord.media.upload.UploadContext
 import me.darefox.videosharebot.match.CompositeMatcher
-import me.darefox.videosharebot.match.services.*
 import me.darefox.videosharebot.tools.stringtransformers.MarkdownCodeInline
+import me.darefox.videosharebot.tools.toValues
+
 class MessageListener : Extension() {
     override val name: String = this::class.simpleName!!
     private val log = createLogger()
 
-    val compositeParser = CompositeMatcher(
-        setOf(
-            TikTokMatcher,
-            YoutubeShortsMatcher,
-            TwitterMatcher,
-            RedditMatcher,
-            VkMatcher,
-            InstagramMatcher
-        )
+    private val compositeParser = CompositeMatcher(
+        UrlMatcherMapping.entries
+            .filter(GlobalApplicationConfig.cobalt.servicesFilter)
+            .toValues()
+            .toSet()
     )
 
     override suspend fun setup() {
@@ -48,6 +46,11 @@ class MessageListener : Extension() {
         }
     }
     private suspend fun EventContext<MessageCreateEvent>.actionImpl(scope: CoroutineScope) {
+        val discordConfig = GlobalApplicationConfig.discord
+
+        val guildId = event.guildId ?: return
+        if (discordConfig.serverFilter.isNotAllowed(guildId)) return
+
         if (event.member?.isBot == true) return
         val parsedUrls = compositeParser.parse(event.message.content)
 
@@ -64,7 +67,7 @@ class MessageListener : Extension() {
         val botMessageStatus = BotMessageStatus(botMessage, scope, defaultTransformer)
 
         log.info { "Trying to ask cobalt for $originalUrl" }
-        val client = Cobalt("https://co.wuk.sh/")
+        val client = Cobalt(GlobalApplicationConfig.cobalt.cobaltApiUrl.toString())
         val response = tryAsResult<WrappedCobaltResponse, Exception> {
             client.request(originalUrl.url) { removeTikTokWatermark = true }
         }

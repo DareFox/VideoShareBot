@@ -2,14 +2,20 @@ package me.darefox.videosharebot.kord.media.upload
 
 import dev.forkhandles.result4k.peekFailure
 import me.darefox.cobaltik.wrapper.*
+import me.darefox.videosharebot.config.GlobalApplicationConfig
+import me.darefox.videosharebot.config.UrlMatcherMapping
+import me.darefox.videosharebot.config.filter
 import me.darefox.videosharebot.extensions.ResultMonad
+import me.darefox.videosharebot.ffmpeg.FFmpegBuilderStep
 import me.darefox.videosharebot.match.CompositeMatcherResult
 import me.darefox.videosharebot.match.services.InstagramMatcher
 import me.darefox.videosharebot.tools.stringtransformers.DoNothingWithString
+import me.darefox.videosharebot.tools.toValues
 
 @Suppress("UNCHECKED_CAST")
 object CobaltResponseFactory {
-    private val alwaysStream = mutableListOf(InstagramMatcher)
+    private val cobaltConfig = GlobalApplicationConfig.cobalt
+    private val alwaysStream = cobaltConfig.alwaysDownload.toValues()
     suspend fun uploadMedia(
         parsedResult: CompositeMatcherResult,
         eventContext: UploadContext<WrappedCobaltResponse>

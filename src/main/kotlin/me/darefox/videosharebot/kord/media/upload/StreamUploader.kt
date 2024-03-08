@@ -11,6 +11,8 @@ import kotlinx.io.Buffer
 import kotlinx.io.asInputStream
 import kotlinx.io.readByteArray
 import me.darefox.cobaltik.wrapper.StreamResponse
+import me.darefox.videosharebot.config.GlobalApplicationConfig
+import me.darefox.videosharebot.config.isEnabled
 import me.darefox.videosharebot.extensions.*
 import me.darefox.videosharebot.http.requestFile
 import me.darefox.videosharebot.kord.extensions.maxByteFileSize
@@ -23,6 +25,7 @@ import me.darefox.videosharebot.tools.*
 import java.io.InputStream
 import java.io.PipedOutputStream
 
+// TODO: Refactor StreamUpload and UploaderFactory to support all configurations options
 data object StreamUploader : Uploader<StreamResponse, StreamError>() {
     private val log = this.createLogger()
     override suspend fun upload(context: UploadContext<StreamResponse>) = withContext(Dispatchers.IO) {
@@ -36,7 +39,11 @@ data object StreamUploader : Uploader<StreamResponse, StreamError>() {
         val result = requestFile(response.streamUrl) { http ->
             log.info { "Requesting ${response.streamUrl}" }
             filename = http.filename() ?: return@requestFile Failure(CantGetFilename)
-            http.read(botMessageStatus, maxSizeIncluding, filename, VideoOptimization())
+            val optimization = when {
+                isEnabled(GlobalApplicationConfig.optimization) -> VideoOptimization()
+                else -> null
+            }
+            http.read(botMessageStatus, maxSizeIncluding, filename, optimization)
         }
 
         val stream = when (result) {
@@ -55,6 +62,7 @@ data object StreamUploader : Uploader<StreamResponse, StreamError>() {
 
         Success()
     }
+
 
     private suspend fun HttpResponse.read(
         botMessageStatus: BotMessageStatus,
