@@ -3,13 +3,17 @@ package me.darefox.videosharebot.extensions
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.coroutineContext
+
 
 fun CoroutineScope.createChildScope(useSupervisor: Boolean, context: CoroutineContext? = null): CoroutineScope {
     val job = when {
         useSupervisor -> SupervisorJob(parent = this.coroutineContext[Job])
         else -> Job(parent = this.coroutineContext[Job])
     }
-    return (context?.let { CoroutineScope(it) } ?: this) + job
+    val newContext = this.coroutineContext + job + (context ?: EmptyCoroutineContext)
+    return CoroutineScope(newContext)
+}
 }
 /**
  * Add job that awaits cancellation and calls callback on cancellation
