@@ -1,4 +1,4 @@
-package me.darefox.videosharebot.kord.media.upload
+package me.darefox.videosharebot.kord.upload
 
 import dev.forkhandles.result4k.*
 import dev.kord.core.behavior.edit
@@ -16,10 +16,10 @@ import me.darefox.videosharebot.config.isEnabled
 import me.darefox.videosharebot.extensions.*
 import me.darefox.videosharebot.http.requestFile
 import me.darefox.videosharebot.kord.extensions.maxByteFileSize
-import me.darefox.videosharebot.kord.media.optimization.OptimizationFault
-import me.darefox.videosharebot.kord.media.optimization.OptimizationStatus
-import me.darefox.videosharebot.kord.media.optimization.Optimizer
-import me.darefox.videosharebot.kord.media.optimization.VideoOptimization
+import me.darefox.videosharebot.optimization.OptimizationFault
+import me.darefox.videosharebot.optimization.OptimizationStatus
+import me.darefox.videosharebot.optimization.Optimizer
+import me.darefox.videosharebot.optimization.VideoOptimization
 import me.darefox.videosharebot.kord.tools.BotMessageStatus
 import me.darefox.videosharebot.tools.*
 import java.io.InputStream

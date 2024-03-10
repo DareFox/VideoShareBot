@@ -1,4 +1,4 @@
-package me.darefox.videosharebot.kord.media.optimization
+package me.darefox.videosharebot.optimization
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
@@ -12,7 +12,7 @@ import me.darefox.videosharebot.ffmpeg.encoders.NvencH264
 import me.darefox.videosharebot.ffmpeg.encoders.libopus
 import me.darefox.videosharebot.ffmpeg.encoders.nvencH264
 import me.darefox.videosharebot.tools.*
-import me.darefox.videosharebot.kord.media.optimization.FileTooBigAfterOptimizationFault
+import me.darefox.videosharebot.optimization.FileTooBigAfterOptimizationFault
 import java.io.File
 import java.io.InputStream
 import java.nio.file.Files
@@ -92,7 +92,7 @@ class VideoOptimization: Optimizer {
     }
     private fun FFmpegError.convertToOptimizationError() = OptimizationStatus.Fault(
         FFmpegOptimizationFault(
-            message = "Exit with code ${exitCode}.${if (errorLines.isNotEmpty()) "\nLog:${errorLines.joinToString("\n")}" else "" }",
+            message = "Exit with code ${exitCode}.${if (errorLines.isNotEmpty()) "\nLog:${errorLines.joinToString("\n")}" else ""}",
             causedBy = null
         )
     )

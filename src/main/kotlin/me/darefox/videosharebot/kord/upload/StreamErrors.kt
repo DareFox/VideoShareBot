@@ -1,6 +1,6 @@
-package me.darefox.videosharebot.kord.media.upload
+package me.darefox.videosharebot.kord.upload
 
-import me.darefox.videosharebot.kord.media.optimization.OptimizationFault
+import me.darefox.videosharebot.optimization.OptimizationFault
 
 sealed class StreamFault(message: String?, cause: Throwable?) : UploadFault(message, cause)
 

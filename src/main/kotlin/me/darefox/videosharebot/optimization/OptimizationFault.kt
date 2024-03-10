@@ -1,4 +1,4 @@
-package me.darefox.videosharebot.kord.media.optimization
+package me.darefox.videosharebot.optimization
 
 import me.darefox.videosharebot.error.ExpectedFault
 

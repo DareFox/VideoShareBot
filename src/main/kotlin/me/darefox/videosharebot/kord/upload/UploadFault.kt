@@ -1,4 +1,4 @@
-package me.darefox.videosharebot.kord.media.upload
+package me.darefox.videosharebot.kord.upload
 
 import io.ktor.utils.io.errors.*
 import me.darefox.videosharebot.error.ExpectedFault

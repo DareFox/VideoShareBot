@@ -1,4 +1,4 @@
-package me.darefox.videosharebot.kord.media.upload
+package me.darefox.videosharebot.kord.upload
 
 import dev.forkhandles.result4k.peekFailure
 import me.darefox.cobaltik.wrapper.*

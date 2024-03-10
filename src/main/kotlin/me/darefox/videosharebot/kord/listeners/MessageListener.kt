@@ -16,8 +16,8 @@ import me.darefox.videosharebot.extensions.tryAsResult
 import me.darefox.videosharebot.kord.tools.BotMessageStatus
 import me.darefox.videosharebot.kord.extensions.asBotMessage
 import me.darefox.videosharebot.kord.extensions.changeToExceptionError
-import me.darefox.videosharebot.kord.media.upload.CobaltResponseFactory
-import me.darefox.videosharebot.kord.media.upload.UploadContext
+import me.darefox.videosharebot.kord.upload.CobaltResponseFactory
+import me.darefox.videosharebot.kord.upload.UploadContext
 import me.darefox.videosharebot.match.CompositeMatcher
 import me.darefox.videosharebot.tools.stringtransformers.MarkdownCodeInline
 import me.darefox.videosharebot.tools.toValues
@@ -79,7 +79,8 @@ class MessageListener : Extension() {
                 botMessage = botMessage,
                 botMessageStatus = botMessageStatus,
                 cobaltResponse = response.value
-            ))
+            )
+            )
         }
     }
 }

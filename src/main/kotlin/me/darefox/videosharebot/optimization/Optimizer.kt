@@ -1,4 +1,4 @@
-package me.darefox.videosharebot.kord.media.optimization
+package me.darefox.videosharebot.optimization
 
 import kotlinx.coroutines.flow.StateFlow
 import me.darefox.videosharebot.extensions.ResultMonad
@@ -18,7 +18,6 @@ interface Optimizer {
 
 sealed interface OptimizationStatus {
     data class Fault(val value: OptimizationFault): OptimizationStatus
-
     data object NotStarted: OptimizationStatus
     sealed class ValueStatus(val statusValues: Map<String, String>): OptimizationStatus {
         class InProgress(statusValues: Map<String, String>): ValueStatus(statusValues)

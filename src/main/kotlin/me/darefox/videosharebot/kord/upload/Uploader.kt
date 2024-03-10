@@ -1,4 +1,4 @@
-package me.darefox.videosharebot.kord.media.upload
+package me.darefox.videosharebot.kord.upload
 
 import me.darefox.cobaltik.wrapper.WrappedCobaltResponse
 import me.darefox.videosharebot.extensions.ResultMonad
