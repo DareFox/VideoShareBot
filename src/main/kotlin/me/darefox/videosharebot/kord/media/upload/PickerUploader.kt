@@ -16,7 +16,6 @@ import me.darefox.videosharebot.config.GlobalApplicationConfig
 import me.darefox.videosharebot.extensions.ResultMonad
 import me.darefox.videosharebot.extensions.filename
 import me.darefox.videosharebot.extensions.tryAsResult
-import me.darefox.videosharebot.ffmpeg.FFmpegBuilderStep
 import me.darefox.videosharebot.http.requestFile
 import me.darefox.videosharebot.kord.extensions.BotMessage
 import me.darefox.videosharebot.kord.tools.BotMessageStatus
@@ -27,15 +26,15 @@ import me.darefox.videosharebot.tools.Filename
 private typealias ChunkData = Pair<ByteArray, String>
 private typealias ChunkErrorIndexed = Pair<Int, String>
 
-data object PickerUploader: Uploader<PickerResponse, PickerError>() {
-    override suspend fun upload(context: UploadContext<PickerResponse>): ResultMonad<Unit, PickerError> {
+data object PickerUploader: Uploader<PickerResponse>() {
+    override suspend fun upload(context: UploadContext<PickerResponse>): ResultMonad<Unit, PickerFault> {
         val response: PickerResponse = context.cobaltResponse
         val userMessage: Message = context.userMessage
         val botMessage: BotMessage = context.botMessage
         val botMessageStatus: BotMessageStatus = context.botMessageStatus
 
         if (response.type == PickerType.VARIOUS) {
-            return Failure(PickerTypeNotSupported(response.type))
+            return Failure(PickerTypeNotSupportedFault(response.type))
         }
 
         var isAudioSent = false
@@ -119,7 +118,7 @@ data object PickerUploader: Uploader<PickerResponse, PickerError>() {
         }
 
         if (errorList.isNotEmpty()) {
-            return Failure(FailedToDownloadImages(errorList, response.items.size))
+            return Failure(FailedToDownloadImagesFault(errorList, response.items.size))
         } else {
             userMessage.edit {
                 suppressEmbeds = true

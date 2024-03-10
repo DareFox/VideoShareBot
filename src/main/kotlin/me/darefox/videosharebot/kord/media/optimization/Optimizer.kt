@@ -1,6 +1,5 @@
 package me.darefox.videosharebot.kord.media.optimization
 
-import dev.kord.rest.builder.message.EmbedBuilder
 import kotlinx.coroutines.flow.StateFlow
 import me.darefox.videosharebot.extensions.ResultMonad
 import me.darefox.videosharebot.tools.ByteSize
@@ -14,17 +13,14 @@ interface Optimizer {
         input: InputStream,
         outputSizeLimit: ByteSize,
         extension: FileExtension
-    ): ResultMonad<InputStream, OptimizationError>
+    ): ResultMonad<InputStream, OptimizationFault>
 }
 
-sealed class OptimizationStatus {
-    data class Error(override val message: String, val cause: Exception?): OptimizationStatus(), OptimizationError {
-        override val asDiscordMessageText: String = "$message ${if (cause != null)  "caused by $cause" else "" }"
-        override val discordEmbedBuilder: (EmbedBuilder.() -> Unit)? = null
-    }
+sealed interface OptimizationStatus {
+    data class Fault(val value: OptimizationFault): OptimizationStatus
 
-    data object NotStarted: OptimizationStatus()
-    sealed class ValueStatus(val statusValues: Map<String, String>): OptimizationStatus() {
+    data object NotStarted: OptimizationStatus
+    sealed class ValueStatus(val statusValues: Map<String, String>): OptimizationStatus {
         class InProgress(statusValues: Map<String, String>): ValueStatus(statusValues)
         class End(statusValues: Map<String, String>): ValueStatus(statusValues)
     }

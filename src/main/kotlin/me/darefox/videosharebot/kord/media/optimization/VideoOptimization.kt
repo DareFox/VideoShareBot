@@ -12,10 +12,10 @@ import me.darefox.videosharebot.ffmpeg.encoders.NvencH264
 import me.darefox.videosharebot.ffmpeg.encoders.libopus
 import me.darefox.videosharebot.ffmpeg.encoders.nvencH264
 import me.darefox.videosharebot.tools.*
+import me.darefox.videosharebot.kord.media.optimization.FileTooBigAfterOptimizationFault
 import java.io.File
 import java.io.InputStream
 import java.nio.file.Files
-import java.nio.file.OpenOption
 import java.nio.file.StandardOpenOption
 
 class VideoOptimization: Optimizer {
@@ -27,7 +27,7 @@ class VideoOptimization: Optimizer {
         input: InputStream,
         outputSizeLimit: ByteSize,
         extension: FileExtension
-    ): ResultMonad<InputStream, OptimizationError> = withContext(Dispatchers.IO) {
+    ): ResultMonad<InputStream, OptimizationFault> = withContext(Dispatchers.IO) {
         log.info { "Creating temp input file" }
         val tempInput = File.createTempFile("videoFFmpegInput", extension.extension)
         log.info { "Writing to temp input file" }
@@ -36,7 +36,7 @@ class VideoOptimization: Optimizer {
         log.info { "Creating temp output file" }
         val tempOutput = File.createTempFile("videoFFmpegOutput", extension.extension)
 
-        var listenerFailure: Failure<OptimizationError>? = null
+        var listenerFailure: Failure<OptimizationFault>? = null
 
         val ffmpeg = buildFFmpeg(tempInput, tempOutput)
         val ffmpegJob = async(CoroutineName("VideoOptimization-FFMPEG")) {
@@ -47,7 +47,7 @@ class VideoOptimization: Optimizer {
         val listener = launch(CoroutineName("VideoOptimization-StatusCollector")) {
             ffmpeg.status.collect { progress ->
                 if (isBiggerThanLimit(progress, outputSizeLimit)) {
-                    listenerFailure = Failure(FileIsTooBigAfterOptimization)
+                    listenerFailure = Failure(FileTooBigAfterOptimizationFault())
                     ffmpegJob.cancel()
                 }
                 _state.value = progress.convertToOptimizationStatus()
@@ -67,9 +67,10 @@ class VideoOptimization: Optimizer {
             }
         }
 
+
         try {
             when(val result = ffmpegJob.await()) {
-                is Failure -> Failure(result.reason.convertToOptimizationError());
+                is Failure -> Failure(result.reason.convertToOptimizationError().value);
                 is Success -> Success(Files.newInputStream(tempOutput.toPath(), StandardOpenOption.DELETE_ON_CLOSE))
             }.also {
                 isEnd = true
@@ -89,9 +90,11 @@ class VideoOptimization: Optimizer {
             else -> false
         }
     }
-    private fun FFmpegError.convertToOptimizationError() = OptimizationStatus.Error(
-        "Exit with code ${exitCode}.${if (errorLines.isNotEmpty()) "\nLog:${errorLines.joinToString("\n")}" else "" }",
-        null
+    private fun FFmpegError.convertToOptimizationError() = OptimizationStatus.Fault(
+        FFmpegOptimizationFault(
+            message = "Exit with code ${exitCode}.${if (errorLines.isNotEmpty()) "\nLog:${errorLines.joinToString("\n")}" else "" }",
+            causedBy = null
+        )
     )
 
     private fun FFmpegStatus.convertToOptimizationStatus(): OptimizationStatus {

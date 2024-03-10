@@ -16,7 +16,7 @@ import me.darefox.videosharebot.config.isEnabled
 import me.darefox.videosharebot.extensions.*
 import me.darefox.videosharebot.http.requestFile
 import me.darefox.videosharebot.kord.extensions.maxByteFileSize
-import me.darefox.videosharebot.kord.media.optimization.OptimizationError
+import me.darefox.videosharebot.kord.media.optimization.OptimizationFault
 import me.darefox.videosharebot.kord.media.optimization.OptimizationStatus
 import me.darefox.videosharebot.kord.media.optimization.Optimizer
 import me.darefox.videosharebot.kord.media.optimization.VideoOptimization
@@ -26,7 +26,7 @@ import java.io.InputStream
 import java.io.PipedOutputStream
 
 // TODO: Refactor StreamUpload and UploaderFactory to support all configurations options
-data object StreamUploader : Uploader<StreamResponse, StreamError>() {
+data object StreamUploader : Uploader<StreamResponse>() {
     private val log = this.createLogger()
     override suspend fun upload(context: UploadContext<StreamResponse>) = withContext(Dispatchers.IO) {
         val (userMessage, botMessage, botMessageStatus, response) = context
@@ -38,7 +38,7 @@ data object StreamUploader : Uploader<StreamResponse, StreamError>() {
 
         val result = requestFile(response.streamUrl) { http ->
             log.info { "Requesting ${response.streamUrl}" }
-            filename = http.filename() ?: return@requestFile Failure(CantGetFilename)
+            filename = http.filename() ?: return@requestFile Failure(CantGetFilenameFault())
             val optimization = when {
                 isEnabled(GlobalApplicationConfig.optimization) -> VideoOptimization()
                 else -> null
@@ -69,12 +69,12 @@ data object StreamUploader : Uploader<StreamResponse, StreamError>() {
         limit: ByteSize,
         filename: Filename,
         optimizer: Optimizer?
-    ): ResultMonad<InputStream, StreamError> = withContext(Dispatchers.IO + CoroutineName("StreamUploader-Read()")) {
+    ): ResultMonad<InputStream, StreamFault> = withContext(Dispatchers.IO + CoroutineName("StreamUploader-Read()")) {
         val (source, sink) = createPipedStreams()
         val expectedSize = contentLength()?.toByteSize()
-        var optimizationResult: ResultMonad<InputStream, OptimizationError>? = null
+        var optimizationResult: ResultMonad<InputStream, OptimizationFault>? = null
         var optimizationJob: Job? = null
-        var readJob: Deferred<Result<Buffer, StreamError>>? = null
+        var readJob: Deferred<Result<Buffer, StreamFault>>? = null
 
         val cancellation = onCancel {
             log.logCancel(it)
@@ -125,7 +125,7 @@ data object StreamUploader : Uploader<StreamResponse, StreamError>() {
         }
 
         return@withContext when (val result = optimizationResult) {
-            is Failure -> Failure(StreamOptimizationError(result.reason))
+            is Failure -> Failure(StreamOptimizationFault(result.reason))
             is Success -> Success(result.value)
             null -> Success(buffer.asInputStream())
         }
@@ -137,13 +137,13 @@ data object StreamUploader : Uploader<StreamResponse, StreamError>() {
         optimizationJob: Job?,
         sink: PipedOutputStream,
         botMessageStatus: BotMessageStatus
-    ): ResultMonad<Buffer, StreamError> {
+    ): ResultMonad<Buffer, StreamFault> {
         val buffer = Buffer()
         val channel = bodyAsChannel()
         val sizeUnit = ByteUnit.Megabyte
         var offset = 0L
 
-        fun limitBehaviour(buffer: Buffer): Failure<StreamError>? {
+        fun limitBehaviour(buffer: Buffer): Failure<StreamFault>? {
             when (offset >= limit.bytes || limit.bytes < (expectedSize?.bytes ?: 0)) {
                 true -> if (optimizationJob != null) {
                     if (!optimizationJob.isActive) {
@@ -158,7 +158,7 @@ data object StreamUploader : Uploader<StreamResponse, StreamError>() {
                     return null
                 } else {
                     log.info { "File is too big, returning failure" }
-                    return Failure(FileIsTooBig)
+                    return Failure(FileIsTooBigFault())
                 }
                 false -> return null
             }
@@ -178,7 +178,7 @@ data object StreamUploader : Uploader<StreamResponse, StreamError>() {
                     buffer.write(byteArray.sliceArray(0..<currentRead))
                     offset += currentRead
                     when (val result = limitBehaviour(buffer)) {
-                        is Failure<StreamError> -> return result
+                        is Failure<StreamFault> -> return result
                     }
                 }
 
