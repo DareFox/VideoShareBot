@@ -11,6 +11,17 @@ fun CoroutineScope.createChildScope(useSupervisor: Boolean, context: CoroutineCo
     }
     return (context?.let { CoroutineScope(it) } ?: this) + job
 }
+/**
+ * Add job that awaits cancellation and calls callback on cancellation
+ *
+ * **WARNING: Should be used carefully, because it can create infinite awaiting**
+ *
+ * **Example of wrong usage: wrapping scope in [coroutineScope] or [withContext].**
+ * These functions won't return result until every children finishes and if [onCancel] callback exists, program will await infinitely
+ *
+ * @param scope The parent coroutine scope to wrap.
+ */
+@DelicateCoroutinesApi
 fun CoroutineScope.onCancel(context: CoroutineContext? = null, func: (CancellationException) -> Unit): Job {
     val coroutineName = coroutineContext[CoroutineName]?.name ?: "coroutine"
     return launch(CoroutineName("$coroutineName-<onCancel>") + (context ?: EmptyCoroutineContext)) {
