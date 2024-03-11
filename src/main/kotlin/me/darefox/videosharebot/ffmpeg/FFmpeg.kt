@@ -92,19 +92,19 @@ class FFmpeg(
     @OptIn(DelicateCoroutinesApi::class)
     private fun killFFmpeg() {
         GlobalScope.launch {
-            raceWithCancellation(
-                raceOne = {
-                    if (process?.isAlive == false) return@raceWithCancellation
+            raceWithCancellation {
+                addRacer(CoroutineName("Attempt to kill gracefully")) {
+                    if (process?.isAlive == false) return@addRacer
                     log.debug { "Trying to kill gracefully" }
                     process?.destroy()
                     log.debug { "Killed gracefully" }
-                },
-                raceTwo = {
+                }
+                addRacer(CoroutineName("Timeout forced kill")) {
                     delay(20.seconds)
                     process?.destroyForcibly()
                     log.debug { "Killed by force" }
                 }
-            )
+            }
         }
     }
 
