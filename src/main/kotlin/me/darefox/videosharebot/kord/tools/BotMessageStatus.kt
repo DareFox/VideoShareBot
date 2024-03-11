@@ -47,16 +47,16 @@ class BotMessageStatus(
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private val onCancel = scope.onCancel(CoroutineName("BotMessageStatus-OnCancel")) {
-        log.logCancel(it)
+    private val onCancel = scope.invokeOnCancellation {cancel ->
+        log.logCompletion(cancel)
 
-        if (!isActive) return@onCancel
-        messageEditScope.cancel(it)
+        if (!isActive) return@invokeOnCancellation
+        messageEditScope.cancel()
 
         val value = _queued
         if (value is MessageQueueStatus.Value) {
             val newContent =  value.content?.let { value.transformer(it) }
-            if (newContent == _lastEdit) return@onCancel
+            if (newContent == _lastEdit) return@invokeOnCancellation
 
             GlobalScope.launch {
                 editMessage(newContent)
