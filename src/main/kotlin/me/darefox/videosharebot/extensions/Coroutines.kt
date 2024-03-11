@@ -67,6 +67,8 @@ class RaceWithCancellation(val racers: List<Pair<CoroutineContext, suspend Corou
 /**
  * Runs a race between multiple coroutines, when one of them completes it will cancel all remaining coroutines.
  *
+ * This function returns as soon as all racing coroutines are cancelled/completed.
+ *
  * @param context The coroutine context to use for the race.
  * @param builder A builder function for adding racers to the race.
  */
