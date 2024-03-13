@@ -9,6 +9,11 @@ import kotlinx.serialization.encoding.Encoder
 import java.net.MalformedURLException
 import java.net.URL
 
+/**
+ * Attempts to parse this string as a URL.
+ *
+ * @return A [URL] object if the parsing is successful, or null if the string is not a valid URL.
+ */
 fun String.tryParseURL(): URL? {
     return try {
         URL(this)

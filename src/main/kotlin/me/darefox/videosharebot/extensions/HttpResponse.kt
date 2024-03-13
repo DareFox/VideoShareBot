@@ -8,6 +8,12 @@ import me.darefox.videosharebot.tools.Filename
 import java.net.URL
 import kotlin.math.min
 
+/**
+ * Extracts the filename and extension from the HTTP response headers, specifically the "Content-Disposition" header.
+ * If the header is not present, falls back to extracting information from the "Content-Type" header and the request URL.
+ *
+ * @return A [Filename] object containing the extracted filename and extension, or null if extraction is unsuccessful.
+ */
 fun HttpResponse.filename(): Filename? {
     val contentDispositionResult = headers["Content-Disposition"]?.let {
         val regex = Regex("(?<=filename=\").*(?=\")")
