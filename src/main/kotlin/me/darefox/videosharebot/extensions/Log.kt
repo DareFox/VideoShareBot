@@ -4,7 +4,11 @@ import kotlinx.coroutines.CancellationException
 import mu.KLogger
 import mu.KotlinLogging
 
-@OptIn(ExperimentalStdlibApi::class)
+/**
+ * Creates a Kotlin logger for this object.
+ *
+ * @return A [KLogger] instance.
+ */
 fun Any.createLogger(): KLogger {
     val name = javaClass.name
     val slicedName =
@@ -16,6 +20,25 @@ fun Any.createLogger(): KLogger {
     return KotlinLogging.logger("$slicedName@${hashCodeHex()}")
 }
 
+/**
+ * Logs the cancellation event, providing details about the cancellation.
+ *
+ * @param cancellation The [CancellationException] representing the cancellation event.
+ */
 fun KLogger.logCancel(cancellation: CancellationException) {
-    debug { "Cancelled by $cancellation" }
+    logCompletion(cancellation)
 }
+
+/**
+ * Logs the completion event, indicating whether it was successful or cancelled.
+ *
+ * @param cancellation The [CancellationException] representing the cancellation event. If null, the completion is considered successful.
+ */
+fun KLogger.logCompletion(cancellation: CancellationException?) {
+    if (cancellation == null) {
+        debug { "Completed successfully" }
+    } else {
+        debug { "Cancelled by $cancellation" }
+    }
+}
+
