@@ -7,6 +7,9 @@ import dev.forkhandles.result4k.Success
 /** Type alias for [Result] to simplify importing it (Kotlin, Ktor and Result4k provide same class name for this monad) */
 typealias ResultMonad<Val,Err> = Result<Val,Err>
 
+/** Represents the result of an operation that either succeeds with no value (`Unit`) or fails with an error of type `Err`. */
+typealias EmptyResult<Err> = ResultMonad<Unit, Err>
+
 /** Return empty [Success] **/
 fun Success() = Success(Unit)
 
