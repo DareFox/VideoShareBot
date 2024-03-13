@@ -69,7 +69,7 @@ fun CoroutineScope.invokeOnCancellation(handler: (CancellationException) -> Unit
  * @param block The suspendable code block to be executed with a timeout.
  * @return The launched job.
  */
-fun CoroutineScope.launchWithTimeout(context: CoroutineContext, duration: Duration, block: suspend CoroutineScope.() -> Unit): Job {
+fun CoroutineScope.launchWithTimeout(duration: Duration, context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job {
     return launch(CoroutineName("launchWithTimeout")) {
         raceWithCancellation {
             addRacer(CoroutineName("Executable block in launchWithTimeout") + context) { block() }
