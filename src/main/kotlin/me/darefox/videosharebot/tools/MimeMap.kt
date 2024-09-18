@@ -1,4 +1,4 @@
-package me.darefox.videosharebot.http
+package me.darefox.videosharebot.tools
 
 val MimeMap = mapOf<String, String>(
     "audio/aac" to ".aac",

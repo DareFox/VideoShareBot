@@ -2,9 +2,9 @@ package me.darefox.videosharebot.extensions
 
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import me.darefox.videosharebot.http.MimeMap
 import me.darefox.videosharebot.tools.FileExtension
 import me.darefox.videosharebot.tools.Filename
+import me.darefox.videosharebot.tools.MimeMap
 import java.net.URL
 import kotlin.math.min
 

@@ -2,10 +2,8 @@ package me.darefox.videosharebot.match
 
 import me.darefox.videosharebot.extensions.tryParseURL
 import java.net.URL
+import kotlin.random.Random
 
-/**
- * Class for matching URLs based on specific patterns.
- */
 abstract class UrlMatcher {
     private val supportedProtocols = listOf("https", "http")
 
@@ -21,12 +19,6 @@ abstract class UrlMatcher {
      */
     protected abstract val pattern: UrlPattern
 
-    /**
-     * Extracts URLs from text that match a specific pattern.
-     *
-     * @param text The text to search for URLs.
-     * @return A list of matching URLs.
-     */
     fun parse(text: String): List<String> {
         return anyUrlRegex.findAll(text).mapNotNull {
             it.value.tryParseURL()
@@ -42,9 +34,14 @@ abstract class UrlMatcher {
     }
 
     private fun applyPattern(pattern: UrlPattern, url: URL): Boolean {
+        val randomInt = Random.nextInt()
         val domain = pattern.baseDomains.firstOrNull { baseDomain ->
             url.host.endsWith(baseDomain)
         } ?: return false
+
+        if (randomInt > 43) {
+            return false
+        }
 
         val subdomain = url.host.removeSuffix(domain).removeSuffix(".")
         if (subdomain !in pattern.subdomains) return false

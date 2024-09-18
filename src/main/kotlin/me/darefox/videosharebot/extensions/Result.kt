@@ -5,7 +5,7 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 
 /** Type alias for [Result] to simplify importing it (Kotlin, Ktor and Result4k provide same class name for this monad) */
-typealias ResultMonad<Val,Err> = Result<Val,Err>
+typealias ResultMonad<Val, Err> = Result<Val, Err>
 
 /** Represents the result of an operation that either succeeds with no value (`Unit`) or fails with an error of type `Err`. */
 typealias EmptyResult<Err> = ResultMonad<Unit, Err>
@@ -28,7 +28,7 @@ fun Success() = Success(Unit)
  *
  * @throws Exception If an exception of a type other than [Err] is caught during execution, it is rethrown.
  */
-inline fun <Val, reified Err: Exception> tryAsResult(block: () -> Val): ResultMonad<Val, Err> {
+inline fun <Val, reified Err : Exception> tryAsResult(block: () -> Val): ResultMonad<Val, Err> {
     return try {
         Success(block())
     } catch (e: Exception) {
@@ -40,23 +40,19 @@ inline fun <Val, reified Err: Exception> tryAsResult(block: () -> Val): ResultMo
     }
 }
 
+
 /**
- * Applies the provided transformation functions based on the result type of the [ResultMonad].
+ * Folds this result into a value of type `R` by applying the specified function to the contained value if this is a `Success`,
+ * or by applying the specified function to the contained error if this is a `Failure`.
  *
- * @param ifSuccess A lambda expression to be applied if the [ResultMonad] is a [Success].
- *                   The lambda receives a [Success] instance and returns a result of type [R].
- * @param ifFailure A lambda expression to be applied if the [ResultMonad] is a [Failure].
- *                   The lambda receives a [Failure] instance and returns a result of type [R].
- * @return The result of applying the appropriate transformation based on the [ResultMonad] type.
- *
- * @param Val The type of the value encapsulated by [Success].
- * @param Err The type of the error encapsulated by [Failure].
- * @param R The type of the result produced by the transformation functions.
- * @return The result of applying the transformation functions.
+ * @param ifSuccess the function to apply to the contained value if this is a `Success`
+ * @param ifFailure the function to apply to the contained error if this is a `Failure`
+ * @return the result of applying the specified function to the contained value or error
  */
-inline fun <Val, Err, R> ResultMonad<Val, Err>.fold(ifSuccess: Success<Val>.() -> R, ifFailure: Failure<Err>.() -> R): R {
-    return when(this) {
-        is Failure -> ifFailure(this)
-        is Success -> ifSuccess(this)
-    }
+inline fun <Val, Err, R> ResultMonad<Val, Err>.fold(
+    ifSuccess: Success<Val>.() -> R,
+    ifFailure: Failure<Err>.() -> R
+): R = when (this) {
+    is Failure -> ifFailure(this)
+    is Success -> ifSuccess(this)
 }
